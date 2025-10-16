@@ -66,7 +66,7 @@ public class DefaultByteInput implements ByteInput {
         }
     }
 
-    /// 确保 可用
+    /// 确保 有数据可用 (至少 1 字节)
     ///
     /// @return 调用了几次底层拉取
     private long ensureAvailable() throws ScxIOException, NoMoreDataException {
