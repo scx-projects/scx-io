@@ -165,16 +165,17 @@ public class DefaultByteInput implements ByteInput {
         var n = head;
         var pullCount = 0L; // 拉取次数计数器
 
-        while (true) {
+        // 初始只判断索引是否 达到最大长度
+        while (index < maxLength) {
             // 计算当前节点中可读取的最大长度, 确保不超过 max (这里因为是将 int 和 long 值进行最小值比较 所以返回值一定是 int 所以类型转换不会丢失精度)
             var length = (int) min(n.available(), maxLength - index);
             var i = indexer.indexOf(n.chunk.subChunk(n.position, n.position + length));
             // 此处因为支持回溯匹配 所以可能是负数 NO_MATCH 表示真正未找到
             if (i != NO_MATCH) {
                 return index + i;
-            } else {
-                index += length;
             }
+
+            index += length;
 
             // 检查是否已达到最大长度
             if (index >= maxLength) {
