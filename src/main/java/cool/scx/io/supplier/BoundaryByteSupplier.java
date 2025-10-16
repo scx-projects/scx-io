@@ -10,7 +10,7 @@ import cool.scx.io.indexer.KMPByteIndexer;
 
 import java.util.Arrays;
 
-// todo 是否存在边界问题 待检查 ?
+// todo 待重构
 
 /// BoundaryByteSupplier
 ///
