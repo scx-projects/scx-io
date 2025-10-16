@@ -8,6 +8,7 @@ import cool.scx.io.exception.ScxIOException;
 import cool.scx.io.indexer.ByteIndexer;
 import cool.scx.io.supplier.ByteSupplier;
 
+import static cool.scx.io.ByteChunk.EMPTY_CHUNK;
 import static cool.scx.io.indexer.ByteIndexer.NO_MATCH;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.min;
@@ -30,7 +31,7 @@ public class DefaultByteInput implements ByteInput {
 
     public DefaultByteInput(ByteSupplier byteSupplier) {
         this.byteSupplier = byteSupplier;
-        this.head = new ByteNode(new ByteChunk(new byte[]{}));
+        this.head = new ByteNode(EMPTY_CHUNK);
         this.tail = this.head;
         this.markNode = null;
         this.markPosition = 0;
