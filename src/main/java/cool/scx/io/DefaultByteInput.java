@@ -12,6 +12,10 @@ import static cool.scx.io.indexer.ByteIndexer.NO_MATCH;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.min;
 
+/// DefaultByteInput
+///
+/// @author scx567888
+/// @version 0.0.1
 public class DefaultByteInput implements ByteInput {
 
     private final ByteSupplier byteSupplier;
