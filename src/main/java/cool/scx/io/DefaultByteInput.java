@@ -96,7 +96,6 @@ public class DefaultByteInput implements ByteInput {
         var remaining = maxLength; // 剩余需要读取的字节数
         var n = head; // 用于循环的节点
         var pullCount = 0L; // 拉取次数计数器
-        var needMore = true;// 是否需要更多数据 我们默认是 true 表示 至少执行调用一次消费者
 
         // 循环中有 4 种情况
         // 1, 已经读取到足够的数据 我们无需循环
@@ -110,7 +109,7 @@ public class DefaultByteInput implements ByteInput {
             // 计算当前节点可以读取的长度 (这里因为是将 int 和 long 值进行最小值比较 所以返回值一定是 int 所以类型转换不会丢失精度)
             var length = (int) min(remaining, n.available());
             // 调用消费者 写入数据
-            needMore = consumer.accept(n.chunk.subChunk(n.position, n.position + length));
+            var needMore = consumer.accept(n.chunk.subChunk(n.position, n.position + length));
             // 计算剩余字节数
             remaining -= length;
 
