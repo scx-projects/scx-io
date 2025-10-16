@@ -179,7 +179,7 @@ public interface ByteInput extends AutoCloseable {
 
     default long skipAll() throws ScxIOException, AlreadyClosedException, NoMoreDataException {
         var consumer = new SkipByteConsumer();
-        readUpTo(consumer, Long.MAX_VALUE);
+        readAll(consumer);
         return consumer.bytesSkipped();
     }
 
