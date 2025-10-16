@@ -39,23 +39,6 @@ public class ByteInputInputStream extends InputStream implements ByteInputAdapte
     }
 
     @Override
-    public int read(byte[] b) throws IOException {
-        var consumer = new FillByteArrayByteConsumer(b);
-        try {
-            byteInput.read(consumer, b.length);
-        } catch (ScxIOException e) {
-            var cause = e.getCause();
-            if (cause instanceof IOException ioException) {
-                throw ioException;
-            }
-            throw e;
-        } catch (NoMoreDataException e) {
-            return -1;
-        }
-        return consumer.bytesFilled();
-    }
-
-    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         var consumer = new FillByteArrayByteConsumer(b, off, len);
         try {
@@ -84,7 +67,7 @@ public class ByteInputInputStream extends InputStream implements ByteInputAdapte
             }
             throw e;
         } catch (NoMoreDataException e) {
-            return consumer.bytesFilled();
+            return 0;
         }
         return consumer.bytesFilled();
     }
@@ -114,8 +97,6 @@ public class ByteInputInputStream extends InputStream implements ByteInputAdapte
                 throw ioException;
             }
             throw e;
-        } catch (NoMoreDataException e) {
-            return new byte[]{};
         }
     }
 
@@ -136,8 +117,9 @@ public class ByteInputInputStream extends InputStream implements ByteInputAdapte
 
     @Override
     public void skipNBytes(long n) throws IOException {
+        // 注意 InputStream 规定 skipNBytes 需要强制跳过 这里和 readNBytes 的行为是不一致的 (这也是为什么 InputStream 用起来这么混乱)
         try {
-            byteInput.skipUpTo(n);
+            byteInput.skipFully(n);
         } catch (ScxIOException e) {
             var cause = e.getCause();
             if (cause instanceof IOException ioException) {
@@ -160,8 +142,6 @@ public class ByteInputInputStream extends InputStream implements ByteInputAdapte
                 throw ioException;
             }
             throw e;
-        } catch (NoMoreDataException e) {
-            return 0;
         }
         return consumer.bytesWritten();
     }
