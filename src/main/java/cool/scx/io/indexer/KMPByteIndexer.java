@@ -43,10 +43,6 @@ public final class KMPByteIndexer implements ByteIndexer {
 
     @Override
     public int indexOf(ByteChunk chunk) {
-        // 匹配模式为空
-        if (isEmptyPattern()) {
-            return 0;
-        }
 
         //KMP 查找
         for (int i = 0; i < chunk.length; i = i + 1) {
