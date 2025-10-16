@@ -24,7 +24,7 @@ public class DefaultByteInput implements ByteInput {
     private ByteNode tail;
 
     private ByteNode markNode; // 标记节点
-    private int markNodePosition; // 标记位置
+    private int markPosition; // 标记位置
 
     private volatile boolean closed;
 
@@ -33,7 +33,7 @@ public class DefaultByteInput implements ByteInput {
         this.head = new ByteNode(new ByteChunk(new byte[]{}));
         this.tail = this.head;
         this.markNode = null;
-        this.markNodePosition = 0;
+        this.markPosition = 0;
     }
 
     private void appendByteChunk(ByteChunk byteChunk) {
@@ -307,7 +307,7 @@ public class DefaultByteInput implements ByteInput {
     @Override
     public void mark() throws AlreadyClosedException {
         markNode = head;
-        markNodePosition = head.position;
+        markPosition = head.position;
     }
 
     @Override
@@ -317,7 +317,7 @@ public class DefaultByteInput implements ByteInput {
         }
         //重置当前 mark
         head = markNode;
-        head.position = markNodePosition;
+        head.position = markPosition;
         //后续节点全部重置
         var n = head.next;
         while (n != null) {
