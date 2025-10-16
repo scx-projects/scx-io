@@ -2,6 +2,10 @@ package cool.scx.io.test;
 
 import cool.scx.io.DefaultByteInput;
 import cool.scx.io.adapter.ByteInputAdapter;
+import cool.scx.io.exception.AlreadyClosedException;
+import cool.scx.io.exception.NoMatchFoundException;
+import cool.scx.io.exception.NoMoreDataException;
+import cool.scx.io.exception.ScxIOException;
 import cool.scx.io.supplier.ByteArrayByteSupplier;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -10,13 +14,13 @@ import java.io.IOException;
 
 public class MarkTest {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NoMoreDataException, AlreadyClosedException, NoMatchFoundException, ScxIOException {
         test1();
         test2();
     }
 
     @Test
-    public static void test1() throws IOException {
+    public static void test1() throws IOException, AlreadyClosedException, NoMoreDataException, NoMatchFoundException, ScxIOException {
         var data = "你好".repeat(100) + "终结符";
         var s = new DefaultByteInput(new ByteArrayByteSupplier(data.getBytes()));
         s.mark();

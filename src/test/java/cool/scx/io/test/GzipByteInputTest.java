@@ -2,7 +2,10 @@ package cool.scx.io.test;
 
 import cool.scx.io.DefaultByteInput;
 import cool.scx.io.adapter.ByteInputAdapter;
+import cool.scx.io.exception.AlreadyClosedException;
+import cool.scx.io.exception.NoMatchFoundException;
 import cool.scx.io.exception.NoMoreDataException;
+import cool.scx.io.exception.ScxIOException;
 import cool.scx.io.supplier.ByteArrayByteSupplier;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -15,7 +18,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class GzipByteInputTest {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, AlreadyClosedException, NoMatchFoundException, ScxIOException {
         test1();
     }
 
@@ -28,7 +31,7 @@ public class GzipByteInputTest {
     }
 
     @Test
-    public static void test1() throws IOException {
+    public static void test1() throws IOException, AlreadyClosedException, NoMatchFoundException, ScxIOException {
         var rawStr = "1234567890😀🥀👨‍🦰🌵中文!@$%^&*()()";
         var rawData = rawStr.getBytes();
 

@@ -2,7 +2,10 @@ package cool.scx.io.test;
 
 import cool.scx.io.ByteChunk;
 import cool.scx.io.DefaultByteInput;
+import cool.scx.io.exception.AlreadyClosedException;
 import cool.scx.io.exception.NoMatchFoundException;
+import cool.scx.io.exception.NoMoreDataException;
+import cool.scx.io.exception.ScxIOException;
 import cool.scx.io.supplier.ByteArrayByteSupplier;
 import cool.scx.io.supplier.SequenceByteSupplier;
 import org.testng.Assert;
@@ -12,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 
 public class ByteReaderTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoMoreDataException, AlreadyClosedException, NoMatchFoundException, ScxIOException {
         test1();
         test2();
         test3();
@@ -21,7 +24,7 @@ public class ByteReaderTest {
     }
 
     @Test
-    public static void test1() {
+    public static void test1() throws NoMoreDataException, AlreadyClosedException, ScxIOException, NoMatchFoundException {
         var dataReader = new DefaultByteInput(new ByteArrayByteSupplier("11112345678".getBytes(StandardCharsets.UTF_8)));
 
         //不会影响读取
@@ -38,7 +41,7 @@ public class ByteReaderTest {
     }
 
     @Test
-    public static void test2() {
+    public static void test2() throws NoMoreDataException, AlreadyClosedException, NoMatchFoundException, ScxIOException {
         var sp = new ByteArrayByteSupplier(
                 "1234567890".getBytes(),
                 "abcdefghi".getBytes(),
@@ -82,7 +85,7 @@ public class ByteReaderTest {
     }
 
     @Test
-    public static void test4() {
+    public static void test4() throws NoMoreDataException, AlreadyClosedException, ScxIOException {
         var d1 = new ByteArrayByteSupplier("123456aaabbb".getBytes());
         var d2 = new ByteArrayByteSupplier("cccddd456789".getBytes());
         var dataReader = new DefaultByteInput(new SequenceByteSupplier(d1, d2));
@@ -91,7 +94,7 @@ public class ByteReaderTest {
     }
 
     @Test
-    public static void test5() {
+    public static void test5() throws NoMoreDataException, AlreadyClosedException, NoMatchFoundException, ScxIOException {
         var d1 = new ByteArrayByteSupplier("123456aaabbb".getBytes());
         var d2 = new ByteArrayByteSupplier("cccddd456789".getBytes());
         var dataReader = new DefaultByteInput(new SequenceByteSupplier(d1, d2));
