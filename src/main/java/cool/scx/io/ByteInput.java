@@ -13,28 +13,23 @@ import cool.scx.io.indexer.SingleByteIndexer;
 
 /// ByteInput
 ///
-/// - 每次读取操作都是有意义的动作：read / readUpTo 在 length > 0 时至少读取一个字节.
-///   这样保证动作不会成为空操作, 同时消除了 EOF 表达性歧义.
+/// 方法分为两大类, 动作方法/请求方法.
 ///
-/// - EOF(流结束) 是明确的信号: 当无法再读取任何字节时, 抛出 [NoMoreDataException].
-///   这保证循环读取的安全性和逻辑自洽性.
-///
-/// - 方法对读取的容忍度分成三个级别:
-///  - [#read(ByteConsumer,long)] — 宽松
-///  - [#readUpTo(ByteConsumer,long)] — 中等
-///  - [#readFully(ByteConsumer,long)] — 严格
-///
-/// - read 方法族 长度为 0 的特殊处理: (看作一种无动作)
-///   - read / readUpTo / readFully length = 0 -> 均采用同一策略, 立即返回, 不抛异常, 即使流已结束.
-///
-/// - 空模式 indexOf 的特殊处理: (看作一种无动作)
-///   - 恒返回 0.
-///
-/// - 读取操作必须产生有效数据, 否则动作没有意义.
-///   - EOF 是动作完成的标志, 而不是普通返回值.
+/// - 动作方法 read / readUpTo / readFully 以及相关的 peek, skip 镜像方法.
+///   - 当 maxLength / length = 0 时, 我们将其看作一种无动作, 均采用统一策略, 立即返回, 不抛异常, 无关流的状态 (即使流以及结束).
+///   - 在 maxLength / length > 0 时, 读取操作必须产生有效数据 (至少读取一个字节), 这样保证动作不会成为空操作 并消除了 "0 字节读取歧义".
+///   - EOF (流结束) 被设计为一种明确的信号, 当无法再读取任何字节时, 会抛出 [NoMoreDataException]. 这保证循环读取的安全性和逻辑自洽性. 同时消除了 EOF 表达性歧义.
 ///   - 严格契约保证用户可以安全循环读取, 同时明确何时流结束.
+///   - 方法对读取的容忍度分成三个级别:
+///     - [#read(ByteConsumer,long)] — 宽松 (可能少于指定长度)
+///     - [#readUpTo(ByteConsumer,long)] — 中等 (尽量读取指定长度)
+///     - [#readFully(ByteConsumer,long)] — 严格 (必须读取指定长度)
 ///
-/// - 该接口设计偏向严格契约和动作完整性, 而非宽松返回空数组. 这保证了 EOF 明确、循环安全, 并消除了 "0 字节读取歧义" .
+/// - 动作方法 indexOf.
+///   - 空匹配模式的 indexOf 看作一种无动作 (因其事实上可以匹配任何数据), 恒返回 0.
+///
+/// - 请求方法 readAll / peekAll / skipAll.
+///   - 和动作方法唯一的不同在于, 请求方法的调用者一般只关心结果 而不是流的结束状态, 所以即使处于 EOF 状态 也会宽松的返回空数组.
 ///
 /// @author scx567888
 /// @version 0.0.1
@@ -125,7 +120,11 @@ public interface ByteInput extends AutoCloseable {
     }
 
     default <X extends Throwable> void readAll(ByteConsumer<X> byteConsumer) throws X, ScxIOException, AlreadyClosedException, NoMoreDataException {
-        this.readUpTo(byteConsumer, Long.MAX_VALUE);
+        try {
+            this.readUpTo(byteConsumer, Long.MAX_VALUE);
+        } catch (NoMoreDataException _) {
+
+        }
     }
 
     default byte[] peek(int maxLength) throws ScxIOException, AlreadyClosedException, NoMoreDataException {
@@ -153,7 +152,11 @@ public interface ByteInput extends AutoCloseable {
     }
 
     default <X extends Throwable> void peekAll(ByteConsumer<X> byteConsumer) throws X, ScxIOException, AlreadyClosedException, NoMoreDataException {
-        peekUpTo(byteConsumer, Long.MAX_VALUE);
+        try {
+            peekUpTo(byteConsumer, Long.MAX_VALUE);
+        } catch (NoMoreDataException _) {
+
+        }
     }
 
     default long skip(long length) throws ScxIOException, AlreadyClosedException, NoMoreDataException {
@@ -171,6 +174,12 @@ public interface ByteInput extends AutoCloseable {
     default long skipFully(long length) throws ScxIOException, AlreadyClosedException, NoMoreDataException {
         var consumer = new SkipByteConsumer();
         readFully(consumer, length);
+        return consumer.bytesSkipped();
+    }
+
+    default long skipAll() throws ScxIOException, AlreadyClosedException, NoMoreDataException {
+        var consumer = new SkipByteConsumer();
+        readAll(consumer);
         return consumer.bytesSkipped();
     }
 
