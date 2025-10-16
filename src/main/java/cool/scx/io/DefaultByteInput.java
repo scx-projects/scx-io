@@ -96,7 +96,7 @@ public class DefaultByteInput implements ByteInput {
      * @param <X>          用户自定义异常
      * @throws X X
      */
-    public <X extends Throwable> void read0(ByteConsumer<X> consumer, long maxLength, boolean movePointer, long maxPullCount, boolean throwOnEOF) throws X, ScxIOException, NoMoreDataException {
+    private <X extends Throwable> void read0(ByteConsumer<X> consumer, long maxLength, boolean movePointer, long maxPullCount, boolean throwOnEOF) throws X, ScxIOException, NoMoreDataException {
 
         var remaining = maxLength; // 剩余需要读取的字节数
         var n = head; // 用于循环的节点
@@ -162,7 +162,7 @@ public class DefaultByteInput implements ByteInput {
 
     }
 
-    public long indexOf0(ByteIndexer indexer, long maxLength, long maxPullCount) throws NoMatchFoundException, ScxIOException {
+    private long indexOf0(ByteIndexer indexer, long maxLength, long maxPullCount) throws NoMatchFoundException, ScxIOException {
 
         var index = 0L; // 主串索引
 
