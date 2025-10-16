@@ -113,13 +113,13 @@ public interface ByteInput extends AutoCloseable {
         return consumer.bytes();
     }
 
-    default byte[] readAll() throws ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default byte[] readAll() throws ScxIOException, AlreadyClosedException {
         var consumer = new ByteArrayByteConsumer();
         readAll(consumer);
         return consumer.bytes();
     }
 
-    default <X extends Throwable> void readAll(ByteConsumer<X> byteConsumer) throws X, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default <X extends Throwable> void readAll(ByteConsumer<X> byteConsumer) throws X, ScxIOException, AlreadyClosedException {
         try {
             this.readUpTo(byteConsumer, Long.MAX_VALUE);
         } catch (NoMoreDataException _) {
@@ -145,13 +145,13 @@ public interface ByteInput extends AutoCloseable {
         return consumer.bytes();
     }
 
-    default byte[] peekAll() throws ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default byte[] peekAll() throws ScxIOException, AlreadyClosedException {
         var consumer = new ByteArrayByteConsumer();
         peekAll(consumer);
         return consumer.bytes();
     }
 
-    default <X extends Throwable> void peekAll(ByteConsumer<X> byteConsumer) throws X, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default <X extends Throwable> void peekAll(ByteConsumer<X> byteConsumer) throws X, ScxIOException, AlreadyClosedException {
         try {
             peekUpTo(byteConsumer, Long.MAX_VALUE);
         } catch (NoMoreDataException _) {
@@ -177,7 +177,7 @@ public interface ByteInput extends AutoCloseable {
         return consumer.bytesSkipped();
     }
 
-    default long skipAll() throws ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default long skipAll() throws ScxIOException, AlreadyClosedException {
         var consumer = new SkipByteConsumer();
         readAll(consumer);
         return consumer.bytesSkipped();
