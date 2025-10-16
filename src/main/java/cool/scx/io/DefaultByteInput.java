@@ -307,12 +307,16 @@ public class DefaultByteInput implements ByteInput {
 
     @Override
     public void mark() throws AlreadyClosedException {
+        ensureOpen();// 确保 open
+
         markNode = head;
         markPosition = head.position;
     }
 
     @Override
     public void reset() throws AlreadyClosedException {
+        ensureOpen();// 确保 open
+
         if (markNode == null) {
             return;
         }
