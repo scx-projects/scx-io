@@ -42,21 +42,28 @@ public class DefaultByteInput implements ByteInput {
         tail = tail.next;
     }
 
+    /// 从 byteSupplier 中持续拉取直到得到有效数据块
+    ///
     /// @return EOF
     private boolean pullByteChunk() throws ScxIOException {
-        ByteChunk byteChunk;
-        try {
-            byteChunk = byteSupplier.get();
-        } catch (ScxIOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ScxIOException(e);
+        while (true) {
+            ByteChunk byteChunk;
+            try {
+                byteChunk = byteSupplier.get();
+            } catch (ScxIOException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new ScxIOException(e);
+            }
+            if (byteChunk == null) {
+                return true; // EOF
+            }
+            if (byteChunk.length == 0) {
+                continue;// 空块 我们视为无动作 继续拉取
+            }
+            appendByteChunk(byteChunk);
+            return false;
         }
-        if (byteChunk == null) {
-            return true; // EOF
-        }
-        appendByteChunk(byteChunk);
-        return false;
     }
 
     /// 确保 open
@@ -72,16 +79,17 @@ public class DefaultByteInput implements ByteInput {
     private long ensureAvailable() throws ScxIOException, NoMoreDataException {
         var pullCount = 0L;
         // 保证 当前 head 中至少有 1个 字节
-        while (!head.hasAvailable()) {
-            if (head.next == null) {
-                var eof = this.pullByteChunk();
-                if (eof) {
-                    throw new NoMoreDataException();
-                }
-                pullCount = pullCount + 1;
-            }
-            head = head.next;
+        if (head.hasAvailable()) {
+            return pullCount;
         }
+        if (head.next == null) {
+            var eof = this.pullByteChunk();
+            if (eof) {
+                throw new NoMoreDataException();
+            }
+            pullCount = pullCount + 1;
+        }
+        head = head.next;
         return pullCount;
     }
 
