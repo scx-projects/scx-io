@@ -9,6 +9,7 @@ import cool.scx.io.ByteNode;
 /// @version 0.0.1
 public final class ByteArrayByteConsumer implements ByteConsumer<RuntimeException> {
 
+    /// 这里我们只将 ByteNode 作为一个简单的 链表存储单元 不涉及到使用 position
     private ByteNode head;
     private ByteNode tail;
     private int total;
@@ -43,7 +44,7 @@ public final class ByteArrayByteConsumer implements ByteConsumer<RuntimeExceptio
 
         // 只调用了一次 accept, 我们直接返回当前数据
         if (node.next == null) {
-            return node.chunk.getBytes(node.position);
+            return node.chunk.getBytes();
         }
 
         // 多个数据我们合并
@@ -51,10 +52,10 @@ public final class ByteArrayByteConsumer implements ByteConsumer<RuntimeExceptio
         int offset = 0;
 
         do {
-            int length = node.available();
-            int chunkOffset = node.chunk.start + node.position;
-            System.arraycopy(node.chunk.bytes, chunkOffset, bytes, offset, length);
-            offset += length;
+            int chunkLength = node.chunk.length;
+            int chunkOffset = node.chunk.start;
+            System.arraycopy(node.chunk.bytes, chunkOffset, bytes, offset, chunkLength);
+            offset += chunkLength;
             node = node.next;
         } while (node != null);
 
