@@ -52,10 +52,10 @@ public final class ByteArrayByteConsumer implements ByteConsumer<RuntimeExceptio
         int offset = 0;
 
         do {
-            int length = node.chunk.length;
+            int chunkLength = node.chunk.length;
             int chunkOffset = node.chunk.start;
-            System.arraycopy(node.chunk.bytes, chunkOffset, bytes, offset, length);
-            offset += length;
+            System.arraycopy(node.chunk.bytes, chunkOffset, bytes, offset, chunkLength);
+            offset += chunkLength;
             node = node.next;
         } while (node != null);
 
