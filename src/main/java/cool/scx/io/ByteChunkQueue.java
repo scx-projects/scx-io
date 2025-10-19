@@ -1,5 +1,9 @@
 package cool.scx.io;
 
+/// ByteChunkQueue
+///
+/// @author scx567888
+/// @version 0.0.1
 public class ByteChunkQueue {
 
     private ByteNode head;
