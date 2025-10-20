@@ -214,6 +214,10 @@ public interface ByteInput extends AutoCloseable {
         return readUntil(b, Integer.MAX_VALUE);
     }
 
+    /// 从当前 ByteInput 中读取数据直到遇到指定分隔符 (单字节或多字节).
+    ///
+    /// - 返回的数据 不包含分隔符.
+    /// - 方法调用结束后, ByteInput 的读取指针会跳过分隔符, 即下一次读取从分隔符之后开始.
     default byte[] readUntil(byte[] b, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         var index = indexOf(b, maxLength);
         var bytes = readFully((int) index);
