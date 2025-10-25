@@ -21,24 +21,24 @@ public class DefaultByteInput implements ByteInput {
 
     private final ByteSupplier byteSupplier;
 
-    private ByteNode head;
-    private ByteNode tail;
+    private ByteChunkNode head;
+    private ByteChunkNode tail;
 
-    private ByteNode markNode; // 标记节点
+    private ByteChunkNode markNode; // 标记节点
     private int markPosition; // 标记位置
 
     private volatile boolean closed;
 
     public DefaultByteInput(ByteSupplier byteSupplier) {
         this.byteSupplier = byteSupplier;
-        this.head = new ByteNode(EMPTY_CHUNK);
+        this.head = new ByteChunkNode(EMPTY_CHUNK);
         this.tail = this.head;
         this.markNode = null;
         this.markPosition = 0;
     }
 
     private void appendByteChunk(ByteChunk byteChunk) {
-        tail.next = new ByteNode(byteChunk);
+        tail.next = new ByteChunkNode(byteChunk);
         tail = tail.next;
     }
 
@@ -355,6 +355,38 @@ public class DefaultByteInput implements ByteInput {
         } finally {
             closed = true;
         }
+    }
+
+    private static class ByteChunkNode {
+
+        public final ByteChunk chunk;
+        /// 相对 索引 0 起始
+        public int position;
+        public ByteChunkNode next;
+
+        public ByteChunkNode(ByteChunk chunk) {
+            this.chunk = chunk;
+            this.position = 0;
+            this.next = null;
+        }
+
+        public int available() {
+            return chunk.length - position;
+        }
+
+        public boolean hasAvailable() {
+            return position < chunk.length;
+        }
+
+        public void reset() {
+            position = 0;
+        }
+
+        @Override
+        public String toString() {
+            return chunk.toString(position);
+        }
+
     }
 
 }
