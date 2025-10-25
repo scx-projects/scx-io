@@ -1,7 +1,7 @@
 package cool.scx.io.consumer;
 
 import cool.scx.io.ByteChunk;
-import cool.scx.io.ByteNode;
+import cool.scx.io.aaa.ByteChunkNode;
 
 /// ByteArrayByteConsumer
 ///
@@ -9,9 +9,8 @@ import cool.scx.io.ByteNode;
 /// @version 0.0.1
 public final class ByteArrayByteConsumer implements ByteConsumer<RuntimeException> {
 
-    /// 这里我们只将 ByteNode 作为一个简单的 链表存储单元 不涉及到使用 position
-    private ByteNode head;
-    private ByteNode tail;
+    private ByteChunkNode head;
+    private ByteChunkNode tail;
     private int total;
 
     public ByteArrayByteConsumer() {
@@ -23,7 +22,7 @@ public final class ByteArrayByteConsumer implements ByteConsumer<RuntimeExceptio
     @Override
     public boolean accept(ByteChunk byteChunk) {
         total += byteChunk.length;
-        var dataNode = new ByteNode(byteChunk);
+        var dataNode = new ByteChunkNode(byteChunk);
         if (head == null) {
             head = dataNode;
             tail = head;
