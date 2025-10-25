@@ -1,7 +1,6 @@
 package cool.scx.io.consumer;
 
 import cool.scx.io.ByteChunk;
-import cool.scx.io.support.ByteChunkNode;
 
 /// ByteArrayByteConsumer
 ///
@@ -59,6 +58,17 @@ public final class ByteArrayByteConsumer implements ByteConsumer<RuntimeExceptio
         } while (node != null);
 
         return bytes;
+    }
+
+    private static class ByteChunkNode {
+
+        public final ByteChunk chunk;
+        public ByteChunkNode next;
+
+        public ByteChunkNode(ByteChunk chunk) {
+            this.chunk = chunk;
+        }
+
     }
 
 }
