@@ -58,17 +58,33 @@ public final class BoundaryByteSupplier2 implements ByteSupplier {
             return null;
         }
 
-        byteInput.peek(consumer, Long.MAX_VALUE);
+        try {
+            byteInput.peek(consumer, Long.MAX_VALUE);
+        } catch (NoMoreDataException e) {
+            isFinish = true;
+            return null;
+        }
+
+        // 读取当前块
         var byteChunk = consumer.byteChunk();
+
+        // 计算 索引
         var i = byteIndexer.indexOf(byteChunk);
 
-        System.out.println(byteChunk);
-
+        // 匹配到了 应该终结
         if (i != NO_MATCH) {
+            // 计算针对当前块来说的 安全索引
             var safeLength = i + byteIndexer.pattern().length;
+            // 这里按照常规流程, 这里的 skip 只可能读取缓冲区中的数据, 也就是说理论上不可能出现 NoMoreDataException.
+            // 但如果真的出现了 NoMoreDataException, 则说明是其他情况导致的 比如外部在 另一线程中 读取了 byteInput.
+            // 针对这种预计之外的异常, 这里直接抛出即可
             byteInput.skipFully(safeLength);
+
             byteChunk = byteChunk.subChunk(0, safeLength);
+
             isFinish = true;
+
+            //todo 这里需要 移除尾部的 boundaryBytes
             if (cache.isEmpty()) {
                 return byteChunk;
             } else {
@@ -79,21 +95,25 @@ public final class BoundaryByteSupplier2 implements ByteSupplier {
         }
 
         // 未匹配到, 需要判断是 完全未匹配 还是 部分匹配
-        if (byteIndexer.matchedLength() == 0) {
-            // 完全未匹配 表示当前块可以 安全使用
+        if (byteIndexer.matchedLength() == 0) { // 完全未匹配 表示当前块可以 安全使用
+            // 异常相关说明, 参考上面分支的 byteInput.skipFully(safeLength);
             byteInput.skipFully(byteChunk.length);
             // 如果当前缓存 没有数据直接返回 否则添加到缓存中等待下次 读取
             if (cache.isEmpty()) {
                 return byteChunk;
             } else {
+                // 有缓存 添加到缓存中
                 cache.append(byteChunk);
+                // 允许使用 缓存块
                 useCache = true;
                 return EMPTY_CHUNK;
             }
-        } else {
-            // 部分匹配 我们不能确定这个块是安全的 所以先缓存起来 等待下次读取
+        } else { // 部分匹配 我们不能确定这个块是安全的 所以先缓存起来 等待下次读取
+            // 异常相关说明, 参考上面分支的 byteInput.skipFully(safeLength);
             byteInput.skipFully(byteChunk.length);
             cache.append(byteChunk);
+            // 因为 不能确定这个块是安全的, 我们这里不允许使用 缓存块
+            useCache = false;
             return EMPTY_CHUNK;
         }
 
