@@ -1,7 +1,7 @@
 package cool.scx.io.consumer;
 
 import cool.scx.io.ByteChunk;
-import cool.scx.io.node.ByteChunkNode;
+import cool.scx.io.support.ByteChunkNode;
 
 /// ByteArrayByteConsumer
 ///

@@ -1,4 +1,4 @@
-package cool.scx.io.node;
+package cool.scx.io.support;
 
 import cool.scx.io.ByteChunk;
 
