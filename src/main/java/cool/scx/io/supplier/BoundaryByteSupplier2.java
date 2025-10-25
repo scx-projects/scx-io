@@ -80,14 +80,14 @@ public final class BoundaryByteSupplier2 implements ByteSupplier {
             // 针对这种预计之外的异常, 这里直接抛出即可
             byteInput.skipFully(safeLength);
 
-            byteChunk = byteChunk.subChunk(0, safeLength);
-
             isFinish = true;
 
-            //todo 这里需要 移除尾部的 boundaryBytes
             if (cache.isEmpty()) {
-                return byteChunk;
+                // 返回的块不应包含 分隔符
+                return byteChunk.subChunk(0, i);
             } else {
+                //todo 这里需要 移除尾部的 boundaryBytes
+                byteChunk = byteChunk.subChunk(0, safeLength);
                 cache.append(byteChunk);
                 useCache = true;
                 return EMPTY_CHUNK;
