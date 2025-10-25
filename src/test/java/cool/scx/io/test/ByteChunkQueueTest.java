@@ -1,7 +1,7 @@
 package cool.scx.io.test;
 
 import cool.scx.io.ByteChunk;
-import cool.scx.io.ByteChunkQueue;
+import cool.scx.io.support.ByteChunkQueue;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

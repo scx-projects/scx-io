@@ -1,4 +1,6 @@
-package cool.scx.io;
+package cool.scx.io.support;
+
+import cool.scx.io.ByteChunk;
 
 /// ByteChunkQueue
 ///
@@ -6,8 +8,8 @@ package cool.scx.io;
 /// @version 0.0.1
 public class ByteChunkQueue {
 
-    private ByteNode head;
-    private ByteNode tail;
+    private ByteChunkNode head;
+    private ByteChunkNode tail;
     private long totalLength;
 
     public ByteChunkQueue() {
@@ -17,7 +19,7 @@ public class ByteChunkQueue {
     }
 
     public void append(ByteChunk chunk) {
-        var node = new ByteNode(chunk);
+        var node = new ByteChunkNode(chunk);
         if (head == null) {
             head = node;
             tail = head;
@@ -47,6 +49,17 @@ public class ByteChunkQueue {
 
     public long totalLength() {
         return totalLength;
+    }
+
+    private static class ByteChunkNode {
+
+        public final ByteChunk chunk;
+        public ByteChunkNode next;
+
+        public ByteChunkNode(ByteChunk chunk) {
+            this.chunk = chunk;
+        }
+
     }
 
 }
