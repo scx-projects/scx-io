@@ -35,7 +35,7 @@ public final class BitMaskByteIndexer implements ByteIndexer {
     @Override
     public int indexOf(ByteChunk chunk) {
 
-        var endBit = 1 << (pattern.length - 1);
+        var endBit = 1L << (pattern.length - 1);
 
         // BitMask 查找
         for (var i = 0; i < chunk.length; i = i + 1) {
@@ -68,7 +68,6 @@ public final class BitMaskByteIndexer implements ByteIndexer {
 
     @Override
     public int matchedLength() {
-        //todo
         return Long.SIZE - Long.numberOfLeadingZeros(state);
     }
 
