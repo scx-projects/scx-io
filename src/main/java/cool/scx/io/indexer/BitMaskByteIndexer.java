@@ -50,8 +50,6 @@ public final class BitMaskByteIndexer implements ByteIndexer {
             state = ((state << 1) | 1L) & m;
 
             if ((state & endBit) != 0) {
-                // 重置 state 为 0, 保证下次匹配
-                state = 0;
                 // 当前索引 - 回退量 (模式串长度 - 1)
                 return i - (pattern.length - 1);
             }
@@ -62,8 +60,8 @@ public final class BitMaskByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public int patternLength() {
-        return pattern.length;
+    public boolean isEmptyPattern() {
+        return pattern.length == 0;
     }
 
     @Override
