@@ -25,7 +25,7 @@ public interface ByteIndexer {
     /// 模式串长度
     int patternLength();
 
-    /// 当前已经匹配的字节长度
+    /// 当前已经连续匹配的字节长度
     int matchedLength();
 
     /// 重置匹配状态
