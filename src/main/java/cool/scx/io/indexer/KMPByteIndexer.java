@@ -68,19 +68,16 @@ public final class KMPByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public boolean isEmptyPattern() {
-        return pattern.length == 0;
+    public int patternLength() {
+        return pattern.length;
     }
 
-    public byte[] pattern() {
-        return pattern;
-    }
-
-    /// 当前已匹配的模式串长度
+    @Override
     public int matchedLength() {
         return matchedLength;
     }
 
+    @Override
     public void reset() {
         matchedLength = 0;
     }
