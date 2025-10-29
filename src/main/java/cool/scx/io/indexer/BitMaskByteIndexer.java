@@ -40,7 +40,9 @@ public final class BitMaskByteIndexer implements ByteIndexer {
         // BitMask 查找
         for (var i = 0; i < chunk.length; i = i + 1) {
 
-            var idx = chunk.getByte(i) & 0xFF;
+            var currentByte = chunk.getByte(i);
+
+            var idx = currentByte & 0xFF;
 
             var m = mask[idx];
 
