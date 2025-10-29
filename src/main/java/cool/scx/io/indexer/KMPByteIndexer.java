@@ -58,10 +58,10 @@ public final class KMPByteIndexer implements ByteIndexer {
             }
 
             if (matchedLength == pattern.length) {
-                var result = i - matchedLength + 1;
                 // 重置 patternIndex 为 0, 保证下次匹配
                 matchedLength = 0;
-                return result;
+                // 当前索引 - 回退量 (模式串长度 - 1)
+                return i - (pattern.length - 1);
             }
         }
         return NO_MATCH;
