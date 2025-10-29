@@ -183,6 +183,10 @@ public interface ByteInput extends AutoCloseable {
         return consumer.bytesSkipped();
     }
 
+    default long indexOf(ByteIndexer byteIndexer) {
+        return indexOf(byteIndexer, Long.MAX_VALUE);
+    }
+
     default long indexOf(byte b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(b, Long.MAX_VALUE);
     }
