@@ -302,7 +302,7 @@ public class DefaultByteInput implements ByteInput {
     public long indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         ensureOpen();// 确保 open
 
-        if (indexer.patternLength() == 0) {
+        if (indexer.isEmptyPattern()) {
             return 0;
         }
 
