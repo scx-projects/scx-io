@@ -17,19 +17,19 @@ public final class IndexMatchResult {
 
     /// - 若完全未匹配或部分匹配, 该数据无意义.
     /// - 若完全匹配, 表示 相对于 当前 chunk 的索引值, 因为允许跨 chunk, 索引值可能位于之前的 chunk, 这时可以是 负数索引.
-    public final int index;
+    public final long index;
 
     /// - 若完全未匹配或部分匹配, 该数据无意义.
     /// - 若完全匹配, 表示本次实际匹配的长度
     public final int matchedLength;
 
-    private IndexMatchResult(IndexMatchStatus status, int index, int matchedLength) {
+    private IndexMatchResult(IndexMatchStatus status, long index, int matchedLength) {
         this.status = status;
         this.index = index;
         this.matchedLength = matchedLength;
     }
 
-    public static IndexMatchResult fullMatch(int index, int matchedLength) {
+    public static IndexMatchResult fullMatch(long index, int matchedLength) {
         return new IndexMatchResult(FULL_MATCH, index, matchedLength);
     }
 

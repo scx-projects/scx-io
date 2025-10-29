@@ -8,6 +8,7 @@ import cool.scx.io.exception.NoMatchFoundException;
 import cool.scx.io.exception.NoMoreDataException;
 import cool.scx.io.exception.ScxIOException;
 import cool.scx.io.indexer.ByteIndexer;
+import cool.scx.io.indexer.IndexMatchResult;
 import cool.scx.io.indexer.KMPByteIndexer;
 import cool.scx.io.indexer.SingleByteIndexer;
 
@@ -80,7 +81,7 @@ public interface ByteInput extends AutoCloseable {
     ///   - 如果 maxLength > 0. (正常逻辑)
     ///     - 如果在边界达成条件内仍未匹配到 (如达到 maxLength限制 或 读取过程中遇到 EOF) 抛出 NoMatchFoundException.
     ///     - 如果 当前没有数据可读 (立即遇到 EOF), 则会抛出 NoMoreDataException.
-    long indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException;
+    IndexMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException;
 
     /// 标记当前读取位置.
     /// - 每次调用 mark() 会覆盖上一次的标记 (即不支持嵌套 mark)
@@ -183,23 +184,23 @@ public interface ByteInput extends AutoCloseable {
         return consumer.bytesSkipped();
     }
 
-    default long indexOf(ByteIndexer byteIndexer) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default IndexMatchResult indexOf(ByteIndexer byteIndexer) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(byteIndexer, Long.MAX_VALUE);
     }
 
-    default long indexOf(byte b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default IndexMatchResult indexOf(byte b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(b, Long.MAX_VALUE);
     }
 
-    default long indexOf(byte b, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default IndexMatchResult indexOf(byte b, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(new SingleByteIndexer(b), maxLength);
     }
 
-    default long indexOf(byte[] b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default IndexMatchResult indexOf(byte[] b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(b, Long.MAX_VALUE);
     }
 
-    default long indexOf(byte[] b, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default IndexMatchResult indexOf(byte[] b, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(new KMPByteIndexer(b), maxLength);
     }
 
@@ -212,9 +213,9 @@ public interface ByteInput extends AutoCloseable {
     /// - 返回的数据 不包含模式串.
     /// - 方法调用结束后, ByteInput 的读取指针会跳过模式串的长度, 即下一次读取从模式串之后开始.
     default byte[] readUntil(ByteIndexer byteIndexer, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
-        var index = indexOf(byteIndexer, maxLength);
-        var bytes = readFully((int) index);
-        skipFully(byteIndexer.matchedLength());
+        var indexMatchResult = indexOf(byteIndexer, maxLength);
+        var bytes = readFully((int) indexMatchResult.index);
+        skipFully(indexMatchResult.matchedLength);
         return bytes;
     }
 
@@ -239,8 +240,8 @@ public interface ByteInput extends AutoCloseable {
     }
 
     default byte[] peekUntil(ByteIndexer byteIndexer, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
-        var index = indexOf(byteIndexer, maxLength);
-        return peekFully((int) index);
+        var indexMatchResult = indexOf(byteIndexer, maxLength);
+        return peekFully((int) indexMatchResult.index);
     }
 
     default byte[] peekUntil(byte b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
