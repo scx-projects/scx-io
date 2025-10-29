@@ -29,14 +29,6 @@ public final class IndexMatchResult {
         this.matchedLength = matchedLength;
     }
 
-    public static IndexMatchResult noMatch() {
-        return NO_MATCH_RESULT;
-    }
-
-    public static IndexMatchResult partialMatch() {
-        return PARTIAL_MATCH_RESULT;
-    }
-
     public static IndexMatchResult fullMatch(int index, int matchedLength) {
         return new IndexMatchResult(FULL_MATCH, index, matchedLength);
     }
