@@ -23,7 +23,7 @@ public class BoundaryByteSupplierTest {
     public static void test1() throws NoMoreDataException, AlreadyClosedException, ScxIOException {
         var str = "1234567890888866661111aaaabhellhellhellhhhhheeeeelllbbcccdddeeefffggghhhiiihelloend enden f";
         var rawByteReader = new DefaultByteInput(new InputStreamByteSupplier(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), 1));
-        var newByteReader = new DefaultByteInput(new BoundaryByteSupplier(rawByteReader,new BitMaskByteIndexer("hello".getBytes(StandardCharsets.UTF_8))));
+        var newByteReader = new DefaultByteInput(new BoundaryByteSupplier(rawByteReader, new BitMaskByteIndexer("hello".getBytes(StandardCharsets.UTF_8))));
         var read = newByteReader.readAll();
         Assert.assertEquals(new String(read), "1234567890888866661111aaaabhellhellhellhhhhheeeeelllbbcccdddeeefffggghhhiii");
     }
