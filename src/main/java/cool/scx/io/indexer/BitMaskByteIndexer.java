@@ -10,7 +10,6 @@ public final class BitMaskByteIndexer implements ByteIndexer {
 
     private final byte[] pattern;
     private final long[] mask;
-    private final long endBit;
     private long state;
 
     public BitMaskByteIndexer(byte[] pattern) {
@@ -19,7 +18,6 @@ public final class BitMaskByteIndexer implements ByteIndexer {
         }
         this.pattern = pattern;
         this.mask = buildMask(pattern);
-        this.endBit = 1L << (pattern.length - 1);
         this.state = 0;
     }
 
@@ -37,13 +35,17 @@ public final class BitMaskByteIndexer implements ByteIndexer {
     @Override
     public int indexOf(ByteChunk chunk) {
 
+        var endBit = 1 << (pattern.length - 1);
+
         // BitMask 查找
         for (var i = 0; i < chunk.length; i = i + 1) {
 
             var idx = chunk.getByte(i) & 0xFF;
 
+            var m = mask[idx];
+
             // Shift-And 核心: 向前推进一位 (匹配了新字符),并加上初始状态 (|1)
-            state = ((state << 1) | 1L) & mask[idx];
+            state = ((state << 1) | 1L) & m;
 
             if ((state & endBit) != 0) {
                 // pattern 完整匹配
@@ -59,18 +61,17 @@ public final class BitMaskByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public boolean isEmptyPattern() {
-        return pattern.length == 0;
+    public int patternLength() {
+        return pattern.length;
     }
 
-    public byte[] pattern() {
-        return pattern;
-    }
-
+    @Override
     public int matchedLength() {
+        //todo
         return Long.SIZE - Long.numberOfLeadingZeros(state);
     }
 
+    @Override
     public void reset() {
         state = 0;
     }
