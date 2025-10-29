@@ -6,7 +6,8 @@ import cool.scx.io.consumer.ByteChunkByteConsumer;
 import cool.scx.io.exception.AlreadyClosedException;
 import cool.scx.io.exception.NoMoreDataException;
 import cool.scx.io.exception.ScxIOException;
-import cool.scx.io.indexer.KMPByteIndexer;
+import cool.scx.io.indexer.BitMaskByteIndexer;
+import cool.scx.io.indexer.ByteIndexer;
 
 import java.util.LinkedList;
 
@@ -20,7 +21,7 @@ import static cool.scx.io.indexer.ByteIndexer.NO_MATCH;
 public final class BoundaryByteSupplier implements ByteSupplier {
 
     private final ByteInput byteInput;
-    private final KMPByteIndexer byteIndexer;
+    private final ByteIndexer byteIndexer;
     private final boolean autoClose;
     private final ByteChunkByteConsumer consumer;
     private final LinkedList<ByteChunk> cache;
@@ -33,12 +34,12 @@ public final class BoundaryByteSupplier implements ByteSupplier {
 
     public BoundaryByteSupplier(ByteInput byteInput, byte[] boundaryBytes, boolean autoClose) {
         this.byteInput = byteInput;
-        this.byteIndexer = new KMPByteIndexer(boundaryBytes);
+        this.byteIndexer = new BitMaskByteIndexer(boundaryBytes);
         this.autoClose = autoClose;
         this.consumer = new ByteChunkByteConsumer();
         this.cache = new LinkedList<>();
         this.useCache = false;
-        this.isFinish = this.byteIndexer.isEmptyPattern();
+        this.isFinish = this.byteIndexer.patternLength() == 0;
     }
 
     @Override
@@ -83,7 +84,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
         // 6, 匹配到了 应该终结
         if (i != NO_MATCH) {
             // 计算针对当前块来说的 安全索引.
-            var safeLength = i + byteIndexer.pattern().length;
+            var safeLength = i + byteIndexer.patternLength();
             // 按照常规流程, 这里的 skipFully 只可能读取缓冲区中的数据, 也就是说理论上不可能出现 NoMoreDataException.
             // 但如果真的出现了 NoMoreDataException, 则说明是其他情况导致的, 比如外部在 另一线程中 读取了 byteInput 等.
             // 针对这种预计之外的异常, 这里直接抛出即可
@@ -104,7 +105,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
                 // 但是为了保证 trimTailBytes 的执行逻辑简单. 这里无论当前分块是否包含 有效数据 都进行添加.
                 cache.addLast(byteChunk.subChunk(0, safeLength));
                 // 这里需要 移除尾部的 boundary
-                trimTailBytes(byteIndexer.pattern().length);
+                trimTailBytes(byteIndexer.patternLength());
                 // 允许使用 缓存块
                 useCache = true;
                 // 返回缓存中的数据
