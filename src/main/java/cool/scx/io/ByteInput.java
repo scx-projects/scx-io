@@ -183,7 +183,7 @@ public interface ByteInput extends AutoCloseable {
         return consumer.bytesSkipped();
     }
 
-    default long indexOf(ByteIndexer byteIndexer) {
+    default long indexOf(ByteIndexer byteIndexer) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(byteIndexer, Long.MAX_VALUE);
     }
 
@@ -203,30 +203,44 @@ public interface ByteInput extends AutoCloseable {
         return indexOf(new KMPByteIndexer(b), maxLength);
     }
 
+    default byte[] readUntil(ByteIndexer byteIndexer) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+        return readUntil(byteIndexer, Integer.MAX_VALUE);
+    }
+
+    /// 从当前 ByteInput 中读取数据直到 ByteIndexer 成功匹配.
+    ///
+    /// - 返回的数据 不包含模式串.
+    /// - 方法调用结束后, ByteInput 的读取指针会跳过模式串的长度, 即下一次读取从模式串之后开始.
+    default byte[] readUntil(ByteIndexer byteIndexer, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+        var index = indexOf(byteIndexer, maxLength);
+        var bytes = readFully((int) index);
+        skipFully(byteIndexer.patternLength());
+        return bytes;
+    }
+
     default byte[] readUntil(byte b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return readUntil(b, Integer.MAX_VALUE);
     }
 
     default byte[] readUntil(byte b, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
-        var index = indexOf(b, maxLength);
-        var bytes = readFully((int) index);
-        skipFully(1);
-        return bytes;
+        return readUntil(new SingleByteIndexer(b), maxLength);
     }
 
     default byte[] readUntil(byte[] b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return readUntil(b, Integer.MAX_VALUE);
     }
 
-    /// 从当前 ByteInput 中读取数据直到遇到指定分隔符 (单字节或多字节).
-    ///
-    /// - 返回的数据 不包含分隔符.
-    /// - 方法调用结束后, ByteInput 的读取指针会跳过分隔符, 即下一次读取从分隔符之后开始.
     default byte[] readUntil(byte[] b, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
-        var index = indexOf(b, maxLength);
-        var bytes = readFully((int) index);
-        skipFully(b.length);
-        return bytes;
+        return readUntil(new KMPByteIndexer(b), maxLength);
+    }
+
+    default byte[] peekUntil(ByteIndexer byteIndexer) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+        return peekUntil(byteIndexer, Integer.MAX_VALUE);
+    }
+
+    default byte[] peekUntil(ByteIndexer byteIndexer, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+        var index = indexOf(byteIndexer, maxLength);
+        return peekFully((int) index);
     }
 
     default byte[] peekUntil(byte b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
@@ -234,8 +248,7 @@ public interface ByteInput extends AutoCloseable {
     }
 
     default byte[] peekUntil(byte b, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
-        var index = indexOf(b, maxLength);
-        return peekFully((int) index);
+        return peekUntil(new SingleByteIndexer(b), maxLength);
     }
 
     default byte[] peekUntil(byte[] b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
@@ -243,8 +256,7 @@ public interface ByteInput extends AutoCloseable {
     }
 
     default byte[] peekUntil(byte[] b, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
-        var index = indexOf(b, maxLength);
-        return peekFully((int) index);
+        return peekUntil(new KMPByteIndexer(b), maxLength);
     }
 
 }
