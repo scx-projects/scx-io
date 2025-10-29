@@ -2,6 +2,9 @@ package cool.scx.io.indexer;
 
 import cool.scx.io.ByteChunk;
 
+import static cool.scx.io.indexer.IndexMatchResult.NO_MATCH_RESULT;
+import static cool.scx.io.indexer.IndexMatchResult.fullMatch;
+
 /// SingleByteIndexer
 ///
 /// @author scx567888
@@ -15,24 +18,19 @@ public final class SingleByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public int indexOf(ByteChunk chunk) {
+    public IndexMatchResult indexOf(ByteChunk chunk) {
         //普通 查找
         for (var i = 0; i < chunk.length; i = i + 1) {
             if (chunk.getByte(i) == b) {
-                return i;
+                return fullMatch(i, 1);
             }
         }
-        return NO_MATCH;
+        return NO_MATCH_RESULT;
     }
 
     @Override
     public boolean isEmptyPattern() {
         return false;
-    }
-
-    @Override
-    public int matchedLength() {
-        return 0;
     }
 
     @Override
