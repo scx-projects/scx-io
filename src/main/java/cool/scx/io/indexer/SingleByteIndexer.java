@@ -26,8 +26,8 @@ public final class SingleByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public int patternLength() {
-        return 1;
+    public boolean isEmptyPattern() {
+        return false;
     }
 
     @Override
