@@ -6,7 +6,6 @@ import cool.scx.io.consumer.ByteChunkByteConsumer;
 import cool.scx.io.exception.AlreadyClosedException;
 import cool.scx.io.exception.NoMoreDataException;
 import cool.scx.io.exception.ScxIOException;
-import cool.scx.io.indexer.BitMaskByteIndexer;
 import cool.scx.io.indexer.ByteIndexer;
 
 import java.util.LinkedList;
@@ -28,13 +27,13 @@ public final class BoundaryByteSupplier implements ByteSupplier {
     private boolean useCache;
     private boolean isFinish;
 
-    public BoundaryByteSupplier(ByteInput byteInput, byte[] boundaryBytes) {
-        this(byteInput, boundaryBytes, false);
+    public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer) {
+        this(byteInput, byteIndexer, false);
     }
 
-    public BoundaryByteSupplier(ByteInput byteInput, byte[] boundaryBytes, boolean autoClose) {
+    public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer, boolean autoClose) {
         this.byteInput = byteInput;
-        this.byteIndexer = new BitMaskByteIndexer(boundaryBytes);
+        this.byteIndexer = byteIndexer;
         this.autoClose = autoClose;
         this.consumer = new ByteChunkByteConsumer();
         this.cache = new LinkedList<>();
