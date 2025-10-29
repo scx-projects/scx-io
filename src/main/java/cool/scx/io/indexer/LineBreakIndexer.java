@@ -10,63 +10,54 @@ import cool.scx.io.ByteChunk;
 /// @version 0.0.1
 public final class LineBreakIndexer implements ByteIndexer {
 
-    private int state = 0; // 0 nothing, 1 saw \r
-    private int lastMatchedLength = 0; // 1 or 2
+    private int matchedLength;
+
+    public LineBreakIndexer() {
+        this.matchedLength = 0;
+    }
 
     @Override
     public int indexOf(ByteChunk chunk) {
 
-        for (int i = 0; i < chunk.length; i++) {
-            byte b = chunk.getByte(i);
+        for (int i = 0; i < chunk.length; i = i + 1) {
 
-            if (state == 0) {
-                if (b == '\n') {
-                    lastMatchedLength = 1;
-                    state = 0;
-                    return i;
-                } else if (b == '\r') {
-                    state = 1;
-                    continue;
+            var currentByte = chunk.getByte(i);
+
+            if (matchedLength == 0 || matchedLength == 2) { // 未曾匹配
+                if (currentByte == '\n') {
+                    matchedLength = 1; // 重置匹配状态
+                    return i; // 直接匹配到 \n
+                } else if (currentByte == '\r') {
+                    matchedLength = 1; // 暂存状态, 等待 \n
                 }
-            } else if (state == 1) {
-                if (b == '\n') {
-                    lastMatchedLength = 2;
-                    state = 0;
-                    return i - 1; // match "\r\n"
-                } else {
-                    // previous \r stands alone
-                    lastMatchedLength = 1;
-                    // 注意：匹配发生在上一字节
-                    int pos = i - 1;
-                    // 当前字节若是 '\r' 继续保持状态，否则清空
-                    state = (b == '\r') ? 1 : 0;
-                    return pos;
+            } else if (matchedLength == 1) {
+                if (currentByte == '\n') {
+                    matchedLength = 2; // 重置匹配状态
+                    return i - 1; // \r 后匹配 \n
+                } else if (currentByte == '\r') {
+                    matchedLength = 1; // 当前字符又是 \r, 保留状态, 相当于重启匹配
+                }else{
+                    matchedLength = 0; // \r 后不是 \n, 重置匹配状态
                 }
             }
         }
 
-        // 未匹配成功
-        lastMatchedLength = 0;
         return NO_MATCH;
     }
 
     @Override
-    public int patternLength() {
-        // ✅ 匹配成功后返回真实长度（1 或 2）
-        // ✅ 匹配前必须返回 > 0（避免误判为空模式）
-        return lastMatchedLength == 0 ? 1 : lastMatchedLength;
+    public boolean isEmptyPattern() {
+        return false;
     }
 
     @Override
     public int matchedLength() {
-        // \r 已读 1 字节是部分匹配
-        return state == 1 ? 1 : 0;
+        return matchedLength;
     }
 
     @Override
     public void reset() {
-        state = 0;
-        lastMatchedLength = 0;
+        matchedLength = 0;
     }
 
 }
