@@ -23,21 +23,24 @@ public final class LineBreakIndexer implements ByteIndexer {
 
             var currentByte = chunk.getByte(i);
 
-            if (matchedLength == 0 || matchedLength == 2) { // 未曾匹配
+            // 未曾匹配 或者 已经处于匹配成功状态
+            if (matchedLength == 0 || matchedLength == 2) {
                 if (currentByte == '\n') {
-                    matchedLength = 1; // 重置匹配状态
-                    return i; // 直接匹配到 \n
+                    matchedLength = 1; // \n 匹配成功
+                    return i;
                 } else if (currentByte == '\r') {
                     matchedLength = 1; // 暂存状态, 等待 \n
+                } else {
+                    matchedLength = 0; // 重置匹配
                 }
             } else if (matchedLength == 1) {
                 if (currentByte == '\n') {
-                    matchedLength = 2; // 重置匹配状态
-                    return i - 1; // \r 后匹配 \n
+                    matchedLength = 2; // \r\n 匹配成功
+                    return i - 1;
                 } else if (currentByte == '\r') {
-                    matchedLength = 1; // 当前字符又是 \r, 保留状态, 相当于重启匹配
-                }else{
-                    matchedLength = 0; // \r 后不是 \n, 重置匹配状态
+                    matchedLength = 1; // 当前字符又是 \r, 重启匹配
+                } else {
+                    matchedLength = 0; // 重置匹配
                 }
             }
         }
