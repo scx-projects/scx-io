@@ -214,7 +214,7 @@ public interface ByteInput extends AutoCloseable {
     default byte[] readUntil(ByteIndexer byteIndexer, int maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         var index = indexOf(byteIndexer, maxLength);
         var bytes = readFully((int) index);
-        skipFully(byteIndexer.patternLength());
+        skipFully(byteIndexer.matchedLength());
         return bytes;
     }
 
