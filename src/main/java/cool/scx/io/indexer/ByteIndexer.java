@@ -10,23 +10,13 @@ import cool.scx.io.ByteChunk;
 /// @version 0.0.1
 public interface ByteIndexer {
 
-    int NO_MATCH = Integer.MIN_VALUE;
-
-    ///
-    /// - 若未匹配到, 请返回 NO_MATCH.
-    /// - 若匹配到, 请返回 相对于 当前 chunk 的索引值,
-    ///   因为跨 chunk 的原因, 索引值可能位于之前的 chunk, 这时允许 负数索引.
-    /// - 可以不处理 空匹配模式 的边界情况 (上层会根据 patternLength == 0 直接走快速路径), 但要保证 patternLength 实现正确
-    ///
-    /// @param chunk chunk
-    /// @return 匹配的索引位置
-    int indexOf(ByteChunk chunk);
+    /// - 可以不处理 空匹配模式 的边界情况 (上层会根据 patternLength == 0 直接走快速路径), 但要保证 patternLength 实现正确.
+    IndexMatchResult indexOf(ByteChunk chunk);
 
     /// 是否为空匹配模式
+    /// - 对于固定长度模式串: 返回 是否是空模式串
+    /// - 对于无法确定的可变长度模式串 (如正则), 返回 false.
     boolean isEmptyPattern();
-
-    /// 当前已经连续匹配的字节长度
-    int matchedLength();
 
     /// 重置匹配状态
     void reset();
