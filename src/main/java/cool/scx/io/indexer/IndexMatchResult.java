@@ -12,6 +12,8 @@ public final class IndexMatchResult {
 
     public static final IndexMatchResult PARTIAL_MATCH_RESULT = new IndexMatchResult(PARTIAL_MATCH, -1, -1);
 
+    public static final IndexMatchResult EMPTY_MATCH_RESULT = new IndexMatchResult(FULL_MATCH, 0, 0);
+
     /// 匹配状态
     public final IndexMatchStatus status;
 

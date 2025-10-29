@@ -10,8 +10,7 @@ import cool.scx.io.indexer.IndexMatchResult;
 import cool.scx.io.supplier.ByteSupplier;
 
 import static cool.scx.io.ByteChunk.EMPTY_CHUNK;
-import static cool.scx.io.indexer.IndexMatchResult.NO_MATCH_RESULT;
-import static cool.scx.io.indexer.IndexMatchResult.fullMatch;
+import static cool.scx.io.indexer.IndexMatchResult.*;
 import static cool.scx.io.indexer.IndexMatchStatus.FULL_MATCH;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.min;
@@ -306,7 +305,7 @@ public class DefaultByteInput implements ByteInput {
         ensureOpen();// 确保 open
 
         if (indexer.isEmptyPattern()) {
-            return NO_MATCH_RESULT;
+            return EMPTY_MATCH_RESULT;
         }
 
         if (maxLength > 0) {

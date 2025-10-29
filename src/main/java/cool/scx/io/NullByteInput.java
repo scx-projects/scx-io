@@ -6,6 +6,9 @@ import cool.scx.io.exception.NoMatchFoundException;
 import cool.scx.io.exception.NoMoreDataException;
 import cool.scx.io.exception.ScxIOException;
 import cool.scx.io.indexer.ByteIndexer;
+import cool.scx.io.indexer.IndexMatchResult;
+
+import static cool.scx.io.indexer.IndexMatchResult.EMPTY_MATCH_RESULT;
 
 /// NullByteInput
 ///
@@ -92,11 +95,11 @@ public class NullByteInput implements ByteInput {
     }
 
     @Override
-    public long indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    public IndexMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         ensureOpen();
 
         if (indexer.isEmptyPattern()) {
-            return 0;
+            return EMPTY_MATCH_RESULT;
         }
 
         if (maxLength > 0) {
