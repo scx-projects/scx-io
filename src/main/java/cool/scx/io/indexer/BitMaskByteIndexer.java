@@ -2,6 +2,8 @@ package cool.scx.io.indexer;
 
 import cool.scx.io.ByteChunk;
 
+import static cool.scx.io.indexer.IndexMatchResult.*;
+
 /// BitMaskByteIndexer
 ///
 /// @author scx567888
@@ -33,7 +35,7 @@ public final class BitMaskByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public int indexOf(ByteChunk chunk) {
+    public IndexMatchResult indexOf(ByteChunk chunk) {
 
         var endBit = 1L << (pattern.length - 1);
 
@@ -50,23 +52,20 @@ public final class BitMaskByteIndexer implements ByteIndexer {
             state = ((state << 1) | 1L) & m;
 
             if ((state & endBit) != 0) {
+                // 重置 state 为 0, 保证下次匹配
+                state = 0;
                 // 当前索引 - 回退量 (模式串长度 - 1)
-                return i - (pattern.length - 1);
+                return fullMatch(i - (pattern.length - 1), pattern.length);
             }
 
         }
 
-        return NO_MATCH;
+        return state == 0 ? NO_MATCH_RESULT : PARTIAL_MATCH_RESULT;
     }
 
     @Override
     public boolean isEmptyPattern() {
         return pattern.length == 0;
-    }
-
-    @Override
-    public int matchedLength() {
-        return Long.SIZE - Long.numberOfLeadingZeros(state);
     }
 
     @Override

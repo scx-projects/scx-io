@@ -60,7 +60,8 @@ public final class KMPByteIndexer implements ByteIndexer {
             }
 
             if (matchedLength == pattern.length) {
-                matchedLength = 0; // 重置状态 保证下次匹配
+                // 重置 matchedLength, 保证下次匹配
+                matchedLength = 0;
                 // 当前索引 - 回退量 (模式串长度 - 1)
                 return fullMatch(i - (pattern.length - 1), pattern.length);
             }
