@@ -95,7 +95,7 @@ public class NullByteInput implements ByteInput {
     public long indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         ensureOpen();
 
-        if (indexer.isEmptyPattern()) {
+        if (indexer.patternLength() == 0) {
             return 0;
         }
 
