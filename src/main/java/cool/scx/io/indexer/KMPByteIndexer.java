@@ -2,6 +2,8 @@ package cool.scx.io.indexer;
 
 import cool.scx.io.ByteChunk;
 
+import static cool.scx.io.indexer.IndexMatchResult.*;
+
 /// KMPByteIndexer
 ///
 /// @author scx567888
@@ -42,7 +44,7 @@ public final class KMPByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public int indexOf(ByteChunk chunk) {
+    public IndexMatchResult indexOf(ByteChunk chunk) {
 
         //KMP 查找
         for (int i = 0; i < chunk.length; i = i + 1) {
@@ -58,21 +60,18 @@ public final class KMPByteIndexer implements ByteIndexer {
             }
 
             if (matchedLength == pattern.length) {
+                matchedLength = 0; // 重置状态 保证下次匹配
                 // 当前索引 - 回退量 (模式串长度 - 1)
-                return i - (pattern.length - 1);
+                return fullMatch(i - (pattern.length - 1), pattern.length);
             }
         }
-        return NO_MATCH;
+
+        return matchedLength == 0 ? NO_MATCH_RESULT : PARTIAL_MATCH_RESULT;
     }
 
     @Override
     public boolean isEmptyPattern() {
         return pattern.length == 0;
-    }
-
-    @Override
-    public int matchedLength() {
-        return matchedLength;
     }
 
     @Override
