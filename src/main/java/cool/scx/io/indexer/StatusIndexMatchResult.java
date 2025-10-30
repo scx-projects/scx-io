@@ -4,6 +4,8 @@ import static cool.scx.io.indexer.StatusIndexMatchResult.Status.*;
 
 /// StatusIndexMatchResult
 ///
+/// 表示 ByteIndexer 的状态机输出, 一般内部使用.
+///
 /// @author scx567888
 /// @version 0.0.1
 public final class StatusIndexMatchResult {
