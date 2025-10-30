@@ -95,7 +95,7 @@ public class BoundaryByteSupplierTest {
     @Test
     public static void testBoundaryAcrossChunks() throws NoMoreDataException, AlreadyClosedException, ScxIOException {
         var str = "12345hel" + "lo67890"; // boundary "hello" 跨 chunk
-        for (int chunkSize = 1; chunkSize <= 5; chunkSize++) {
+        for (int chunkSize = 1; chunkSize <= 5; chunkSize = chunkSize + 1) {
             var rawReader = new DefaultByteInput(new InputStreamByteSupplier(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), chunkSize));
             var supplier = new BoundaryByteSupplier(rawReader, new KMPByteIndexer("hello".getBytes(StandardCharsets.UTF_8)), true);
             var result = new DefaultByteInput(supplier).readAll();

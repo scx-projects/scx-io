@@ -30,7 +30,7 @@ public class LineBreakIndexerTest {
             def\r
             """;
 
-        for (int i = 1; i < 1000; i++) {
+        for (int i = 1; i < 1000; i = i + 1) {
             var rawDataInput = new DefaultByteInput(new InputStreamByteSupplier(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), i));
 
             var indexer = new LineBreakByteIndexer();
