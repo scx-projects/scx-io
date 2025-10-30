@@ -38,7 +38,7 @@ public class GzipByteInputTest {
         var gzipData = toGzipBytes(rawData);
 
         var s = new ArrayList<byte[]>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i = i + 1) {
             s.add(gzipData);
         }
 

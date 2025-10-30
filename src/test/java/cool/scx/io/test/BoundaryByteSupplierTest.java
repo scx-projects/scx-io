@@ -24,7 +24,7 @@ public class BoundaryByteSupplierTest {
     @Test
     public static void test1() throws NoMoreDataException, AlreadyClosedException, ScxIOException {
         var str = "1234567890888866661111aaaabhellhellhellhhhhheeeeelllbbcccdddeeefffggghhhiiihelloend enden f";
-        for (int i = 1; i < 1000; i++) {
+        for (int i = 1; i < 1000; i = i + 1) {
             var rawByteReader = new DefaultByteInput(new InputStreamByteSupplier(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), i));
             var newByteReader = new DefaultByteInput(new BoundaryByteSupplier(rawByteReader, new BitMaskByteIndexer("hello".getBytes(StandardCharsets.UTF_8))));
             var read = newByteReader.readAll();
@@ -35,7 +35,7 @@ public class BoundaryByteSupplierTest {
     @Test
     public static void test2() throws NoMoreDataException, AlreadyClosedException, ScxIOException {
         var str = "1234567890888866661111aaaabhellhellhellhhhhheeeeelllbbcccdddeeefffggghhhiiihelloend enden f";
-        for (int i = 1; i < 1000; i++) {
+        for (int i = 1; i < 1000; i = i + 1) {
             var rawByteReader = new DefaultByteInput(new InputStreamByteSupplier(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), i));
             var newByteReader = new DefaultByteInput(new BoundaryByteSupplier(rawByteReader, new KMPByteIndexer("hello".getBytes(StandardCharsets.UTF_8))));
             var read = newByteReader.readAll();
