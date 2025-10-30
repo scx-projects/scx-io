@@ -10,7 +10,7 @@ import cool.scx.io.indexer.ByteIndexer;
 
 import java.util.LinkedList;
 
-import static cool.scx.io.ByteChunk.EMPTY_CHUNK;
+import static cool.scx.io.ByteChunk.EMPTY_BYTE_CHUNK;
 import static cool.scx.io.indexer.StatusByteMatchResult.Status.FULL_MATCH;
 import static cool.scx.io.indexer.StatusByteMatchResult.Status.NO_MATCH;
 
@@ -138,7 +138,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
             // 因为 不能确定这个块是安全的, 我们这里不允许使用 缓存块
             useCache = false;
             // 返回 EMPTY_CHUNK, 表示暂时无法提供数据
-            return EMPTY_CHUNK;
+            return EMPTY_BYTE_CHUNK;
         }
 
     }

@@ -6,7 +6,7 @@ package cool.scx.io;
 /// @version 0.0.1
 public final class ByteChunk {
 
-    public static final ByteChunk EMPTY_CHUNK = new ByteChunk(new byte[]{});
+    public static final ByteChunk EMPTY_BYTE_CHUNK = new ByteChunk(new byte[]{});
 
     public final byte[] bytes;
     public final int start;
