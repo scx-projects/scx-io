@@ -6,12 +6,11 @@ import cool.scx.io.exception.NoMatchFoundException;
 import cool.scx.io.exception.NoMoreDataException;
 import cool.scx.io.exception.ScxIOException;
 import cool.scx.io.indexer.ByteIndexer;
-import cool.scx.io.indexer.IndexMatchResult;
 import cool.scx.io.supplier.ByteSupplier;
 
 import static cool.scx.io.ByteChunk.EMPTY_CHUNK;
-import static cool.scx.io.indexer.IndexMatchResult.*;
-import static cool.scx.io.indexer.IndexMatchStatus.FULL_MATCH;
+import static cool.scx.io.IndexMatchResult.*;
+import static cool.scx.io.indexer.StatusIndexMatchResult.Status.FULL_MATCH;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.min;
 
@@ -186,7 +185,7 @@ public class DefaultByteInput implements ByteInput {
             var indexMatchResult = indexer.indexOf(n.chunk.subChunk(n.position, n.position + length));
             // 此处因为支持回溯匹配 所以可能是负数 NO_MATCH 表示真正未找到
             if (indexMatchResult.status == FULL_MATCH) {
-                return fullMatch(index + indexMatchResult.index, indexMatchResult.matchedLength);
+                return new IndexMatchResult(index + indexMatchResult.index, indexMatchResult.matchedLength);
             }
 
             index += length;

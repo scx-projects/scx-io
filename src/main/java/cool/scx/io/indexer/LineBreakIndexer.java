@@ -2,7 +2,7 @@ package cool.scx.io.indexer;
 
 import cool.scx.io.ByteChunk;
 
-import static cool.scx.io.indexer.IndexMatchResult.*;
+import static cool.scx.io.indexer.StatusIndexMatchResult.*;
 
 /// LineBreakIndexer
 ///
@@ -19,7 +19,7 @@ public final class LineBreakIndexer implements ByteIndexer {
     }
 
     @Override
-    public IndexMatchResult indexOf(ByteChunk chunk) {
+    public StatusIndexMatchResult indexOf(ByteChunk chunk) {
 
         for (int i = 0; i < chunk.length; i = i + 1) {
 

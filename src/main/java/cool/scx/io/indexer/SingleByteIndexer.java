@@ -2,8 +2,8 @@ package cool.scx.io.indexer;
 
 import cool.scx.io.ByteChunk;
 
-import static cool.scx.io.indexer.IndexMatchResult.NO_MATCH_RESULT;
-import static cool.scx.io.indexer.IndexMatchResult.fullMatch;
+import static cool.scx.io.indexer.StatusIndexMatchResult.NO_MATCH_RESULT;
+import static cool.scx.io.indexer.StatusIndexMatchResult.fullMatch;
 
 /// SingleByteIndexer
 ///
@@ -18,7 +18,7 @@ public final class SingleByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public IndexMatchResult indexOf(ByteChunk chunk) {
+    public StatusIndexMatchResult indexOf(ByteChunk chunk) {
         //普通 查找
         for (var i = 0; i < chunk.length; i = i + 1) {
             if (chunk.getByte(i) == b) {

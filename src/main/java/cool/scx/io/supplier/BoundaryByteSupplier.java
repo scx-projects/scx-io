@@ -11,8 +11,8 @@ import cool.scx.io.indexer.ByteIndexer;
 import java.util.LinkedList;
 
 import static cool.scx.io.ByteChunk.EMPTY_CHUNK;
-import static cool.scx.io.indexer.IndexMatchStatus.FULL_MATCH;
-import static cool.scx.io.indexer.IndexMatchStatus.NO_MATCH;
+import static cool.scx.io.indexer.StatusIndexMatchResult.Status.FULL_MATCH;
+import static cool.scx.io.indexer.StatusIndexMatchResult.Status.NO_MATCH;
 
 /// BoundaryByteSupplier
 ///
@@ -99,7 +99,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
             if (cache.isEmpty()) {
                 // 根据方法行为设定, 返回的块不应包含 分隔符.
                 // 这里既然没有缓存 就说明 当前块中包含了完整的 boundary, 所以直接使用 i 进行 截断是安全的.
-                return byteChunk.subChunk(0, (int) indexMatchResult.index);
+                return byteChunk.subChunk(0, indexMatchResult.index);
             } else {
                 // 这里既然有缓存, 就说明当前分块只是包含了部分的 boundary.
                 // 所以不能直接使用 i 截断, 而是应该使用 safeLength.

@@ -2,7 +2,7 @@ package cool.scx.io.indexer;
 
 import cool.scx.io.ByteChunk;
 
-import static cool.scx.io.indexer.IndexMatchResult.*;
+import static cool.scx.io.indexer.StatusIndexMatchResult.*;
 
 /// BitMaskByteIndexer
 ///
@@ -35,7 +35,7 @@ public final class BitMaskByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public IndexMatchResult indexOf(ByteChunk chunk) {
+    public StatusIndexMatchResult indexOf(ByteChunk chunk) {
 
         var endBit = 1L << (pattern.length - 1);
 
