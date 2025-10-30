@@ -11,8 +11,8 @@ import cool.scx.io.indexer.ByteIndexer;
 import java.util.LinkedList;
 
 import static cool.scx.io.ByteChunk.EMPTY_CHUNK;
-import static cool.scx.io.indexer.StatusIndexMatchResult.Status.FULL_MATCH;
-import static cool.scx.io.indexer.StatusIndexMatchResult.Status.NO_MATCH;
+import static cool.scx.io.indexer.StatusByteMatchResult.Status.FULL_MATCH;
+import static cool.scx.io.indexer.StatusByteMatchResult.Status.NO_MATCH;
 
 /// BoundaryByteSupplier
 ///
