@@ -6,12 +6,13 @@ import cool.scx.io.consumer.ByteChunkByteConsumer;
 import cool.scx.io.exception.AlreadyClosedException;
 import cool.scx.io.exception.NoMoreDataException;
 import cool.scx.io.exception.ScxIOException;
-import cool.scx.io.indexer.KMPByteIndexer;
+import cool.scx.io.indexer.ByteIndexer;
 
 import java.util.LinkedList;
 
-import static cool.scx.io.ByteChunk.EMPTY_CHUNK;
-import static cool.scx.io.indexer.ByteIndexer.NO_MATCH;
+import static cool.scx.io.ByteChunk.EMPTY_BYTE_CHUNK;
+import static cool.scx.io.indexer.StatusByteMatchResult.Status.FULL_MATCH;
+import static cool.scx.io.indexer.StatusByteMatchResult.Status.NO_MATCH;
 
 /// BoundaryByteSupplier
 ///
@@ -20,20 +21,20 @@ import static cool.scx.io.indexer.ByteIndexer.NO_MATCH;
 public final class BoundaryByteSupplier implements ByteSupplier {
 
     private final ByteInput byteInput;
-    private final KMPByteIndexer byteIndexer;
+    private final ByteIndexer byteIndexer;
     private final boolean autoClose;
     private final ByteChunkByteConsumer consumer;
     private final LinkedList<ByteChunk> cache;
     private boolean useCache;
     private boolean isFinish;
 
-    public BoundaryByteSupplier(ByteInput byteInput, byte[] boundaryBytes) {
-        this(byteInput, boundaryBytes, false);
+    public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer) {
+        this(byteInput, byteIndexer, false);
     }
 
-    public BoundaryByteSupplier(ByteInput byteInput, byte[] boundaryBytes, boolean autoClose) {
+    public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer, boolean autoClose) {
         this.byteInput = byteInput;
-        this.byteIndexer = new KMPByteIndexer(boundaryBytes);
+        this.byteIndexer = byteIndexer;
         this.autoClose = autoClose;
         this.consumer = new ByteChunkByteConsumer();
         this.cache = new LinkedList<>();
@@ -78,12 +79,14 @@ public final class BoundaryByteSupplier implements ByteSupplier {
         var byteChunk = consumer.byteChunk();
 
         // 5, 计算 索引
-        var i = byteIndexer.indexOf(byteChunk);
+        var indexMatchResult = byteIndexer.indexOf(byteChunk);
 
         // 6, 匹配到了 应该终结
-        if (i != NO_MATCH) {
+        if (indexMatchResult.status == FULL_MATCH) {
+            // 匹配的长度
+            var matchedLength = indexMatchResult.matchedLength;
             // 计算针对当前块来说的 安全索引.
-            var safeLength = i + byteIndexer.pattern().length;
+            var safeLength = indexMatchResult.index + matchedLength;
             // 按照常规流程, 这里的 skipFully 只可能读取缓冲区中的数据, 也就是说理论上不可能出现 NoMoreDataException.
             // 但如果真的出现了 NoMoreDataException, 则说明是其他情况导致的, 比如外部在 另一线程中 读取了 byteInput 等.
             // 针对这种预计之外的异常, 这里直接抛出即可
@@ -96,7 +99,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
             if (cache.isEmpty()) {
                 // 根据方法行为设定, 返回的块不应包含 分隔符.
                 // 这里既然没有缓存 就说明 当前块中包含了完整的 boundary, 所以直接使用 i 进行 截断是安全的.
-                return byteChunk.subChunk(0, i);
+                return byteChunk.subChunk(0, indexMatchResult.index);
             } else {
                 // 这里既然有缓存, 就说明当前分块只是包含了部分的 boundary.
                 // 所以不能直接使用 i 截断, 而是应该使用 safeLength.
@@ -104,7 +107,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
                 // 但是为了保证 trimTailBytes 的执行逻辑简单. 这里无论当前分块是否包含 有效数据 都进行添加.
                 cache.addLast(byteChunk.subChunk(0, safeLength));
                 // 这里需要 移除尾部的 boundary
-                trimTailBytes(byteIndexer.pattern().length);
+                trimTailBytes(matchedLength);
                 // 允许使用 缓存块
                 useCache = true;
                 // 返回缓存中的数据
@@ -113,7 +116,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
         }
 
         // 7, 未匹配到, 需要判断是 完全未匹配 还是 部分匹配
-        if (byteIndexer.matchedLength() == 0) { // 完全未匹配 表示当前块可以 安全使用
+        if (indexMatchResult.status == NO_MATCH) { // 完全未匹配 表示当前块可以 安全使用
             // 异常相关说明, 参考上面的 byteInput.skipFully(safeLength);
             byteInput.skipFully(byteChunk.length);
             // 如果当前缓存 没有数据直接返回 否则添加到缓存中等待下次 读取
@@ -135,7 +138,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
             // 因为 不能确定这个块是安全的, 我们这里不允许使用 缓存块
             useCache = false;
             // 返回 EMPTY_CHUNK, 表示暂时无法提供数据
-            return EMPTY_CHUNK;
+            return EMPTY_BYTE_CHUNK;
         }
 
     }

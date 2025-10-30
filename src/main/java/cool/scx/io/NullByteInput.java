@@ -92,11 +92,11 @@ public class NullByteInput implements ByteInput {
     }
 
     @Override
-    public long indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    public ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         ensureOpen();
 
         if (indexer.isEmptyPattern()) {
-            return 0;
+            return new ByteMatchResult(0, 0);
         }
 
         if (maxLength > 0) {

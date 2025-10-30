@@ -8,8 +8,8 @@ import cool.scx.io.exception.ScxIOException;
 import cool.scx.io.indexer.ByteIndexer;
 import cool.scx.io.supplier.ByteSupplier;
 
-import static cool.scx.io.ByteChunk.EMPTY_CHUNK;
-import static cool.scx.io.indexer.ByteIndexer.NO_MATCH;
+import static cool.scx.io.ByteChunk.EMPTY_BYTE_CHUNK;
+import static cool.scx.io.indexer.StatusByteMatchResult.Status.FULL_MATCH;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.min;
 
@@ -31,7 +31,7 @@ public class DefaultByteInput implements ByteInput {
 
     public DefaultByteInput(ByteSupplier byteSupplier) {
         this.byteSupplier = byteSupplier;
-        this.head = new ByteChunkNode(EMPTY_CHUNK);
+        this.head = new ByteChunkNode(EMPTY_BYTE_CHUNK);
         this.tail = this.head;
         this.markNode = null;
         this.markPosition = 0;
@@ -170,7 +170,7 @@ public class DefaultByteInput implements ByteInput {
 
     }
 
-    private long indexOf0(ByteIndexer indexer, long maxLength, long maxPullCount) throws NoMatchFoundException, ScxIOException {
+    private ByteMatchResult indexOf0(ByteIndexer indexer, long maxLength, long maxPullCount) throws NoMatchFoundException, ScxIOException {
 
         var index = 0L; // 主串索引
 
@@ -181,10 +181,10 @@ public class DefaultByteInput implements ByteInput {
         while (index < maxLength) {
             // 计算当前节点中可读取的最大长度, 确保不超过 max (这里因为是将 int 和 long 值进行最小值比较 所以返回值一定是 int 所以类型转换不会丢失精度)
             var length = (int) min(n.available(), maxLength - index);
-            var i = indexer.indexOf(n.chunk.subChunk(n.position, n.position + length));
+            var indexMatchResult = indexer.indexOf(n.chunk.subChunk(n.position, n.position + length));
             // 此处因为支持回溯匹配 所以可能是负数 NO_MATCH 表示真正未找到
-            if (i != NO_MATCH) {
-                return index + i;
+            if (indexMatchResult.status == FULL_MATCH) {
+                return new ByteMatchResult(index + indexMatchResult.index, indexMatchResult.matchedLength);
             }
 
             index += length;
@@ -299,11 +299,11 @@ public class DefaultByteInput implements ByteInput {
     }
 
     @Override
-    public long indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    public ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         ensureOpen();// 确保 open
 
         if (indexer.isEmptyPattern()) {
-            return 0;
+            return new ByteMatchResult(0, 0);
         }
 
         if (maxLength > 0) {
