@@ -2,7 +2,7 @@ package cool.scx.io.indexer;
 
 import cool.scx.io.ByteChunk;
 
-import static cool.scx.io.indexer.StatusIndexMatchResult.*;
+import static cool.scx.io.indexer.StatusByteMatchResult.*;
 
 /// KMPByteIndexer
 ///
@@ -44,7 +44,7 @@ public final class KMPByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public StatusIndexMatchResult indexOf(ByteChunk chunk) {
+    public StatusByteMatchResult indexOf(ByteChunk chunk) {
 
         //KMP 查找
         for (int i = 0; i < chunk.length; i = i + 1) {
