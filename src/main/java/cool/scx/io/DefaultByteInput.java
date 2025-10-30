@@ -9,8 +9,7 @@ import cool.scx.io.indexer.ByteIndexer;
 import cool.scx.io.supplier.ByteSupplier;
 
 import static cool.scx.io.ByteChunk.EMPTY_CHUNK;
-import static cool.scx.io.IndexMatchResult.*;
-import static cool.scx.io.indexer.StatusIndexMatchResult.Status.FULL_MATCH;
+import static cool.scx.io.indexer.StatusByteMatchResult.Status.FULL_MATCH;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.min;
 
@@ -171,7 +170,7 @@ public class DefaultByteInput implements ByteInput {
 
     }
 
-    private IndexMatchResult indexOf0(ByteIndexer indexer, long maxLength, long maxPullCount) throws NoMatchFoundException, ScxIOException {
+    private ByteMatchResult indexOf0(ByteIndexer indexer, long maxLength, long maxPullCount) throws NoMatchFoundException, ScxIOException {
 
         var index = 0L; // 主串索引
 
@@ -185,7 +184,7 @@ public class DefaultByteInput implements ByteInput {
             var indexMatchResult = indexer.indexOf(n.chunk.subChunk(n.position, n.position + length));
             // 此处因为支持回溯匹配 所以可能是负数 NO_MATCH 表示真正未找到
             if (indexMatchResult.status == FULL_MATCH) {
-                return new IndexMatchResult(index + indexMatchResult.index, indexMatchResult.matchedLength);
+                return new ByteMatchResult(index + indexMatchResult.index, indexMatchResult.matchedLength);
             }
 
             index += length;
@@ -300,11 +299,11 @@ public class DefaultByteInput implements ByteInput {
     }
 
     @Override
-    public IndexMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    public ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         ensureOpen();// 确保 open
 
         if (indexer.isEmptyPattern()) {
-            return EMPTY_MATCH_RESULT;
+            return new ByteMatchResult(0, 0);
         }
 
         if (maxLength > 0) {
