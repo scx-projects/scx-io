@@ -31,7 +31,7 @@ public class LineBreakIndexerTest {
             """;
         var rawDataInput = new DefaultByteInput(new InputStreamByteSupplier(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), 1));
 
-        var indexer=new LineBreakByteIndexer();
+        var indexer = new LineBreakByteIndexer();
         var str1 = new String(rawDataInput.readUntil(indexer));
         var str2 = new String(rawDataInput.readUntil(indexer));
         var str3 = new String(rawDataInput.readUntil(indexer));
