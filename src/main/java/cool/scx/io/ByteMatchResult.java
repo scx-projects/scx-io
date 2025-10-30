@@ -6,8 +6,6 @@ package cool.scx.io;
 /// @version 0.0.1
 public final class ByteMatchResult {
 
-    public static final ByteMatchResult EMPTY_MATCH_RESULT = new ByteMatchResult(0, 0);
-
     public final long index;
 
     public final int matchedLength;
