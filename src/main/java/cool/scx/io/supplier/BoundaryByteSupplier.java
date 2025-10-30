@@ -2,6 +2,7 @@ package cool.scx.io.supplier;
 
 import cool.scx.io.ByteChunk;
 import cool.scx.io.ByteInput;
+import cool.scx.io.ByteInputMark;
 import cool.scx.io.consumer.ByteChunkByteConsumer;
 import cool.scx.io.exception.AlreadyClosedException;
 import cool.scx.io.exception.NoMoreDataException;
@@ -22,24 +23,29 @@ public final class BoundaryByteSupplier implements ByteSupplier {
 
     private final ByteInput byteInput;
     private final ByteIndexer byteIndexer;
+    /// 是否再 source 中保留 Boundary
+    private final boolean keepBoundaryInSource;
     private final boolean autoClose;
     private final ByteChunkByteConsumer consumer;
     private final LinkedList<ByteChunk> cache;
     private boolean useCache;
     private boolean isFinish;
+    private ByteInputMark mark;
 
-    public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer) {
-        this(byteInput, byteIndexer, false);
+    public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer, boolean keepBoundaryInSource) {
+        this(byteInput, byteIndexer, keepBoundaryInSource, false);
     }
 
-    public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer, boolean autoClose) {
+    public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer, boolean keepBoundaryInSource, boolean autoClose) {
         this.byteInput = byteInput;
         this.byteIndexer = byteIndexer;
+        this.keepBoundaryInSource = keepBoundaryInSource;
         this.autoClose = autoClose;
         this.consumer = new ByteChunkByteConsumer();
         this.cache = new LinkedList<>();
         this.useCache = false;
         this.isFinish = this.byteIndexer.isEmptyPattern();
+        this.mark = null;
     }
 
     @Override
@@ -87,10 +93,24 @@ public final class BoundaryByteSupplier implements ByteSupplier {
             var matchedLength = indexMatchResult.matchedLength;
             // 计算针对当前块来说的 安全索引.
             var safeLength = indexMatchResult.index + matchedLength;
+
+            var sourceSkipLength = safeLength;
+
+            // 处理 keepBoundaryInSource
+            if (keepBoundaryInSource) {
+                if (this.mark != null) {
+                    this.mark.reset();
+                }
+                for (var chunk : cache) {
+                    sourceSkipLength += chunk.length;
+                }
+                sourceSkipLength += indexMatchResult.index;
+            }
+
             // 按照常规流程, 这里的 skipFully 只可能读取缓冲区中的数据, 也就是说理论上不可能出现 NoMoreDataException.
             // 但如果真的出现了 NoMoreDataException, 则说明是其他情况导致的, 比如外部在 另一线程中 读取了 byteInput 等.
             // 针对这种预计之外的异常, 这里直接抛出即可
-            byteInput.skipFully(safeLength);
+            byteInput.skipFully(sourceSkipLength);
 
             // 标识不需要在继续读了
             isFinish = true;
@@ -131,6 +151,14 @@ public final class BoundaryByteSupplier implements ByteSupplier {
                 return cache.pollFirst();
             }
         } else { // 部分匹配 我们不能确定这个块是安全的 所以先缓存起来 等待下次读取
+
+            // 处理 keepBoundaryInSource
+            if (keepBoundaryInSource) {
+                if (cache.isEmpty()) {
+                    this.mark = byteInput.mark();
+                }
+            }
+
             // 异常相关说明, 参考上面的 byteInput.skipFully(safeLength);
             byteInput.skipFully(byteChunk.length);
             // 添加到缓存中
