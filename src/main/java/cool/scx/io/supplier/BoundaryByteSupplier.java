@@ -65,7 +65,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
             return null;
         }
 
-        // 处理 keepBoundaryInSource
+        // --- 处理 keepBoundaryInSource ---
         if (keepBoundaryInSource) {
             // 只有 cache 为空时才 mark, 因为 cache 非空意味着 boundary 已经部分出现在之前的 chunk,
             // 如果再 mark, 就无法保证 reset 后 boundary 的完整性
@@ -105,7 +105,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
 
             var sourceSkipLength = safeLength;
 
-            // 处理 keepBoundaryInSource
+            // --- 处理 keepBoundaryInSource ---
             if (keepBoundaryInSource) {
                 if (mark != null) {
                     mark.reset(); // 回到此次 chunk 之前
