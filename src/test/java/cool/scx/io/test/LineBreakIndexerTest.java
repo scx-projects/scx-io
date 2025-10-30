@@ -29,22 +29,25 @@ public class LineBreakIndexerTest {
 
             def\r
             """;
-        var rawDataInput = new DefaultByteInput(new InputStreamByteSupplier(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), 1));
 
-        var indexer = new LineBreakByteIndexer();
-        var str1 = new String(rawDataInput.readUntil(indexer));
-        var str2 = new String(rawDataInput.readUntil(indexer));
-        var str3 = new String(rawDataInput.readUntil(indexer));
-        var str4 = new String(rawDataInput.readUntil(indexer));
-        var str5 = new String(rawDataInput.readUntil(indexer));
-        var str6 = new String(rawDataInput.readUntil(indexer));
+        for (int i = 1; i < 1000; i++) {
+            var rawDataInput = new DefaultByteInput(new InputStreamByteSupplier(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), i));
 
-        Assert.assertEquals(str1, "123");
-        Assert.assertEquals(str2, "456");
-        Assert.assertEquals(str3, "789000");
-        Assert.assertEquals(str4, "abc\r");
-        Assert.assertEquals(str5, "");
-        Assert.assertEquals(str6, "def");
+            var indexer = new LineBreakByteIndexer();
+            var str1 = new String(rawDataInput.readUntil(indexer));
+            var str2 = new String(rawDataInput.readUntil(indexer));
+            var str3 = new String(rawDataInput.readUntil(indexer));
+            var str4 = new String(rawDataInput.readUntil(indexer));
+            var str5 = new String(rawDataInput.readUntil(indexer));
+            var str6 = new String(rawDataInput.readUntil(indexer));
+
+            Assert.assertEquals(str1, "123");
+            Assert.assertEquals(str2, "456");
+            Assert.assertEquals(str3, "789000");
+            Assert.assertEquals(str4, "abc\r");
+            Assert.assertEquals(str5, "");
+            Assert.assertEquals(str6, "def");
+        }
 
     }
 
