@@ -57,11 +57,11 @@ public class ByteReaderTest {
 
         var dataReader = new DefaultByteInput(sp);
 
-        Assert.assertEquals(dataReader.indexOf("1".getBytes()), 0);
-        Assert.assertEquals(dataReader.indexOf("123456789".getBytes()), 0);
-        Assert.assertEquals(dataReader.indexOf("789".getBytes()), 6);
-        Assert.assertEquals(dataReader.indexOf("df".getBytes()), 37);
-        Assert.assertEquals(dataReader.indexOf("ijklmnopqrstu".getBytes()), 18);
+        Assert.assertEquals(dataReader.indexOf("1".getBytes()).index, 0);
+        Assert.assertEquals(dataReader.indexOf("123456789".getBytes()).index, 0);
+        Assert.assertEquals(dataReader.indexOf("789".getBytes()).index, 6);
+        Assert.assertEquals(dataReader.indexOf("df".getBytes()).index, 37);
+        Assert.assertEquals(dataReader.indexOf("ijklmnopqrstu".getBytes()).index, 18);
         try {
             //应该匹配失败
             dataReader.indexOf("?".getBytes());
@@ -70,7 +70,7 @@ public class ByteReaderTest {
 
         }
 
-        Assert.assertEquals(dataReader.indexOf("3579".getBytes()), 40);
+        Assert.assertEquals(dataReader.indexOf("3579".getBytes()).index, 40);
 
     }
 
@@ -99,7 +99,7 @@ public class ByteReaderTest {
         var d2 = new ByteArrayByteSupplier("cccddd456789".getBytes());
         var dataReader = new DefaultByteInput(new SequenceByteSupplier(d1, d2));
         var read = dataReader.indexOf("bbbccc".getBytes());
-        Assert.assertEquals(read, 9);
+        Assert.assertEquals(read.index, 9);
     }
 
 
