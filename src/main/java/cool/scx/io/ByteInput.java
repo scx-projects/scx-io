@@ -80,7 +80,7 @@ public interface ByteInput extends AutoCloseable {
     ///   - 如果 maxLength > 0. (正常逻辑)
     ///     - 如果在边界达成条件内仍未匹配到 (如达到 maxLength限制 或 读取过程中遇到 EOF) 抛出 NoMatchFoundException.
     ///     - 如果 当前没有数据可读 (立即遇到 EOF), 则会抛出 NoMoreDataException.
-    IndexMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException;
+    ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException;
 
     /// 标记当前读取位置.
     /// - 每次调用 mark() 会覆盖上一次的标记 (即不支持嵌套 mark)
@@ -183,23 +183,23 @@ public interface ByteInput extends AutoCloseable {
         return consumer.bytesSkipped();
     }
 
-    default IndexMatchResult indexOf(ByteIndexer byteIndexer) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default ByteMatchResult indexOf(ByteIndexer byteIndexer) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(byteIndexer, Long.MAX_VALUE);
     }
 
-    default IndexMatchResult indexOf(byte b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default ByteMatchResult indexOf(byte b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(b, Long.MAX_VALUE);
     }
 
-    default IndexMatchResult indexOf(byte b, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default ByteMatchResult indexOf(byte b, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(new SingleByteIndexer(b), maxLength);
     }
 
-    default IndexMatchResult indexOf(byte[] b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default ByteMatchResult indexOf(byte[] b) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(b, Long.MAX_VALUE);
     }
 
-    default IndexMatchResult indexOf(byte[] b, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
+    default ByteMatchResult indexOf(byte[] b, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException {
         return indexOf(new KMPByteIndexer(b), maxLength);
     }
 
