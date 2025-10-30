@@ -6,9 +6,8 @@ import cool.scx.io.exception.NoMatchFoundException;
 import cool.scx.io.exception.NoMoreDataException;
 import cool.scx.io.exception.ScxIOException;
 import cool.scx.io.indexer.ByteIndexer;
-import cool.scx.io.indexer.IndexMatchResult;
 
-import static cool.scx.io.indexer.IndexMatchResult.EMPTY_MATCH_RESULT;
+import static cool.scx.io.IndexMatchResult.EMPTY_MATCH_RESULT;
 
 /// NullByteInput
 ///

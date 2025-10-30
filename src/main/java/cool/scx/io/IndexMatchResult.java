@@ -1,4 +1,4 @@
-package cool.scx.io.indexer;
+package cool.scx.io;
 
 /// IndexMatchStatus
 ///
