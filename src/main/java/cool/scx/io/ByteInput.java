@@ -83,7 +83,7 @@ public interface ByteInput extends AutoCloseable {
     ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException;
 
     /// 在当前读取位置创建一个标记.
-    ByteMark mark() throws AlreadyClosedException;
+    ByteInputMark mark() throws AlreadyClosedException;
 
     boolean isClosed();
 
