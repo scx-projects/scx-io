@@ -23,7 +23,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
 
     private final ByteInput byteInput;
     private final ByteIndexer byteIndexer;
-    /// 是否再 source 中保留 Boundary
+    /// 是否在 source 中保留 Boundary
     private final boolean keepBoundaryInSource;
     private final boolean autoClose;
     private final ByteChunkByteConsumer consumer;
