@@ -2,24 +2,24 @@ package cool.scx.io.indexer;
 
 import cool.scx.io.ByteChunk;
 
-import static cool.scx.io.indexer.StatusIndexMatchResult.*;
+import static cool.scx.io.indexer.StatusByteMatchResult.*;
 
-/// LineBreakIndexer
+/// LineBreakByteIndexer
 ///
 /// 可同时匹配 `\r\n` 或 `\n` .
 ///
 /// @author scx567888
 /// @version 0.0.1
-public final class LineBreakIndexer implements ByteIndexer {
+public final class LineBreakByteIndexer implements ByteIndexer {
 
     private int matchedLength;
 
-    public LineBreakIndexer() {
+    public LineBreakByteIndexer() {
         this.matchedLength = 0;
     }
 
     @Override
-    public StatusIndexMatchResult indexOf(ByteChunk chunk) {
+    public StatusByteMatchResult indexOf(ByteChunk chunk) {
 
         for (int i = 0; i < chunk.length; i = i + 1) {
 
@@ -27,8 +27,8 @@ public final class LineBreakIndexer implements ByteIndexer {
 
             // 未曾匹配 或者 已经处于匹配成功状态
             if (matchedLength == 0) {
-                if (currentByte == '\n') {
-                    matchedLength = 0; // \n 匹配成功
+                if (currentByte == '\n') { // \n 匹配成功
+                    matchedLength = 0; // 重置状态
                     return fullMatch(i, 1);
                 } else if (currentByte == '\r') {
                     matchedLength = 1; // 暂存状态, 等待 \n
@@ -36,8 +36,8 @@ public final class LineBreakIndexer implements ByteIndexer {
                     matchedLength = 0; // 重置匹配
                 }
             } else if (matchedLength == 1) {
-                if (currentByte == '\n') {
-                    matchedLength = 0; // \r\n 匹配成功
+                if (currentByte == '\n') { // \r\n 匹配成功
+                    matchedLength = 0; // 重置状态
                     return fullMatch(i - 1, 2);
                 } else if (currentByte == '\r') {
                     matchedLength = 1; // 当前字符又是 \r, 重启匹配
