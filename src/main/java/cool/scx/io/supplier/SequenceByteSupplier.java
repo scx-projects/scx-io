@@ -22,7 +22,7 @@ public final class SequenceByteSupplier implements ByteSupplier {
     }
 
     /// @param dataSupplierList ByteSupplier 列表
-    /// @param closeOnSwitch    是否再切换到下一个的时候关闭上一个
+    /// @param closeOnSwitch    是否在切换到下一个的时候关闭上一个
     public SequenceByteSupplier(Collection<ByteSupplier> dataSupplierList, boolean closeOnSwitch) {
         this.dataSupplierList = dataSupplierList;
         this.closeOnSwitch = closeOnSwitch;

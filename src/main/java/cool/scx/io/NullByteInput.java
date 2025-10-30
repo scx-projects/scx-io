@@ -107,13 +107,9 @@ public class NullByteInput implements ByteInput {
     }
 
     @Override
-    public void mark() throws AlreadyClosedException {
+    public ByteInputMark mark() throws AlreadyClosedException {
         ensureOpen();
-    }
-
-    @Override
-    public void reset() throws AlreadyClosedException {
-        ensureOpen();
+        return new NullByteInputMark(this);
     }
 
     @Override
@@ -124,6 +120,15 @@ public class NullByteInput implements ByteInput {
     @Override
     public void close() throws ScxIOException {
         closed = true;
+    }
+
+    private record NullByteInputMark(NullByteInput nullByteInput) implements ByteInputMark {
+
+        @Override
+        public void reset() throws AlreadyClosedException {
+            nullByteInput.ensureOpen();
+        }
+
     }
 
 }

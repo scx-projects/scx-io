@@ -82,14 +82,8 @@ public interface ByteInput extends AutoCloseable {
     ///     - 如果 当前没有数据可读 (立即遇到 EOF), 则会抛出 NoMoreDataException.
     ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, ScxIOException, AlreadyClosedException, NoMoreDataException;
 
-    /// 标记当前读取位置.
-    /// - 每次调用 mark() 会覆盖上一次的标记 (即不支持嵌套 mark)
-    void mark() throws AlreadyClosedException;
-
-    /// 将读取位置恢复到上一次 mark() 时的状态.
-    /// - 若尚未调用 mark(), 则无效果.
-    /// - 调用 reset() 不会清除标记, 可重复 reset().
-    void reset() throws AlreadyClosedException;
+    /// 在当前读取位置创建一个标记对象.
+    ByteInputMark mark() throws AlreadyClosedException;
 
     boolean isClosed();
 

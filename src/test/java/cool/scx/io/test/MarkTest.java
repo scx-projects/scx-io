@@ -23,9 +23,9 @@ public class MarkTest {
     public static void test1() throws IOException, AlreadyClosedException, NoMoreDataException, NoMatchFoundException, ScxIOException {
         var data = "你好".repeat(100) + "终结符";
         var s = new DefaultByteInput(new ByteArrayByteSupplier(data.getBytes()));
-        s.mark();
+        var mark = s.mark();
         var b1 = s.readUntil("终结符".getBytes());
-        s.reset();
+        mark.reset();
         byte[] b2 = s.readUntil("终结符".getBytes());
         Assert.assertEquals(b1, b2);
     }

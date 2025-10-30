@@ -24,17 +24,12 @@ public class DefaultByteInput implements ByteInput {
     private ByteChunkNode head;
     private ByteChunkNode tail;
 
-    private ByteChunkNode markNode; // 标记节点
-    private int markPosition; // 标记位置
-
     private volatile boolean closed;
 
     public DefaultByteInput(ByteSupplier byteSupplier) {
         this.byteSupplier = byteSupplier;
         this.head = new ByteChunkNode(EMPTY_BYTE_CHUNK);
         this.tail = this.head;
-        this.markNode = null;
-        this.markPosition = 0;
     }
 
     private void appendByteChunk(ByteChunk byteChunk) {
@@ -314,29 +309,10 @@ public class DefaultByteInput implements ByteInput {
     }
 
     @Override
-    public void mark() throws AlreadyClosedException {
+    public ByteInputMark mark() throws AlreadyClosedException {
         ensureOpen();// 确保 open
 
-        markNode = head;
-        markPosition = head.position;
-    }
-
-    @Override
-    public void reset() throws AlreadyClosedException {
-        ensureOpen();// 确保 open
-
-        if (markNode == null) {
-            return;
-        }
-        //重置当前 mark
-        head = markNode;
-        head.position = markPosition;
-        //后续节点全部重置
-        var n = head.next;
-        while (n != null) {
-            n.reset();
-            n = n.next;
-        }
+        return new DefaultByteInputMark(this, head, head.position);
     }
 
     @Override
@@ -385,6 +361,26 @@ public class DefaultByteInput implements ByteInput {
         @Override
         public String toString() {
             return chunk.toString(position);
+        }
+
+    }
+
+    private record DefaultByteInputMark(DefaultByteInput defaultByteInput, ByteChunkNode markNode,
+                                        int markPosition) implements ByteInputMark {
+
+        @Override
+        public void reset() throws AlreadyClosedException {
+            defaultByteInput.ensureOpen();// 确保 open
+
+            //重置当前 mark
+            defaultByteInput.head = markNode;
+            defaultByteInput.head.position = markPosition;
+            //后续节点全部重置
+            var n = defaultByteInput.head.next;
+            while (n != null) {
+                n.reset();
+                n = n.next;
+            }
         }
 
     }

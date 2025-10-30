@@ -1,6 +1,7 @@
 package cool.scx.io.adapter;
 
 import cool.scx.io.ByteInput;
+import cool.scx.io.ByteInputMark;
 import cool.scx.io.consumer.FillByteArrayByteConsumer;
 import cool.scx.io.consumer.OutputStreamByteConsumer;
 import cool.scx.io.exception.NoMoreDataException;
@@ -18,6 +19,7 @@ import java.io.OutputStream;
 public class ByteInputInputStream extends InputStream implements ByteInputAdapter {
 
     private final ByteInput byteInput;
+    private ByteInputMark mark;
 
     public ByteInputInputStream(ByteInput byteInput) {
         this.byteInput = byteInput;
@@ -153,12 +155,14 @@ public class ByteInputInputStream extends InputStream implements ByteInputAdapte
 
     @Override
     public void mark(int readlimit) {
-        byteInput.mark();
+        this.mark = byteInput.mark();
     }
 
     @Override
     public void reset() throws IOException {
-        byteInput.reset();
+        if (this.mark != null) {
+            this.mark.reset();
+        }
     }
 
     @Override
