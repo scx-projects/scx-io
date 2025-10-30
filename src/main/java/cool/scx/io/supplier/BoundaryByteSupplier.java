@@ -65,6 +65,15 @@ public final class BoundaryByteSupplier implements ByteSupplier {
             return null;
         }
 
+        // 处理 keepBoundaryInSource
+        if (keepBoundaryInSource) {
+            // 只有 cache 为空时才 mark, 因为 cache 非空意味着 boundary 已经部分出现在之前的 chunk,
+            // 如果再 mark, 就无法保证 reset 后 boundary 的完整性
+            if (cache.isEmpty()) {
+                mark = byteInput.mark();
+            }
+        }
+
         // 3, 尝试 peek 一个分块
         try {
             byteInput.peek(consumer, Long.MAX_VALUE);
@@ -98,13 +107,14 @@ public final class BoundaryByteSupplier implements ByteSupplier {
 
             // 处理 keepBoundaryInSource
             if (keepBoundaryInSource) {
-                if (this.mark != null) {
-                    this.mark.reset();
+                if (mark != null) {
+                    mark.reset(); // 回到此次 chunk 之前
                 }
+                var cacheLength = 0;
                 for (var chunk : cache) {
-                    sourceSkipLength += chunk.length;
+                    cacheLength += chunk.length;
                 }
-                sourceSkipLength += indexMatchResult.index;
+                sourceSkipLength = cacheLength + indexMatchResult.index;
             }
 
             // 按照常规流程, 这里的 skipFully 只可能读取缓冲区中的数据, 也就是说理论上不可能出现 NoMoreDataException.
@@ -151,14 +161,6 @@ public final class BoundaryByteSupplier implements ByteSupplier {
                 return cache.pollFirst();
             }
         } else { // 部分匹配 我们不能确定这个块是安全的 所以先缓存起来 等待下次读取
-
-            // 处理 keepBoundaryInSource
-            if (keepBoundaryInSource) {
-                if (cache.isEmpty()) {
-                    this.mark = byteInput.mark();
-                }
-            }
-
             // 异常相关说明, 参考上面的 byteInput.skipFully(safeLength);
             byteInput.skipFully(byteChunk.length);
             // 添加到缓存中
