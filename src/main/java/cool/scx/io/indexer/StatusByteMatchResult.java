@@ -1,18 +1,18 @@
 package cool.scx.io.indexer;
 
-import static cool.scx.io.indexer.StatusIndexMatchResult.Status.*;
+import static cool.scx.io.indexer.StatusByteMatchResult.Status.*;
 
-/// StatusIndexMatchResult
+/// StatusByteMatchResult
 ///
 /// 表示 ByteIndexer 的状态机输出, 一般内部使用.
 ///
 /// @author scx567888
 /// @version 0.0.1
-public final class StatusIndexMatchResult {
+public final class StatusByteMatchResult {
 
-    public static final StatusIndexMatchResult NO_MATCH_RESULT = new StatusIndexMatchResult(NO_MATCH, -1, -1);
+    public static final StatusByteMatchResult NO_MATCH_RESULT = new StatusByteMatchResult(NO_MATCH, -1, -1);
 
-    public static final StatusIndexMatchResult PARTIAL_MATCH_RESULT = new StatusIndexMatchResult(PARTIAL_MATCH, -1, -1);
+    public static final StatusByteMatchResult PARTIAL_MATCH_RESULT = new StatusByteMatchResult(PARTIAL_MATCH, -1, -1);
 
     /// 匹配状态
     public final Status status;
@@ -25,14 +25,14 @@ public final class StatusIndexMatchResult {
     /// - 若完全匹配, 表示本次实际匹配的长度
     public final int matchedLength;
 
-    private StatusIndexMatchResult(Status status, int index, int matchedLength) {
+    private StatusByteMatchResult(Status status, int index, int matchedLength) {
         this.status = status;
         this.index = index;
         this.matchedLength = matchedLength;
     }
 
-    public static StatusIndexMatchResult fullMatch(int index, int matchedLength) {
-        return new StatusIndexMatchResult(FULL_MATCH, index, matchedLength);
+    public static StatusByteMatchResult fullMatch(int index, int matchedLength) {
+        return new StatusByteMatchResult(FULL_MATCH, index, matchedLength);
     }
 
     public enum Status {
