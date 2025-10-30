@@ -82,7 +82,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
         var indexMatchResult = byteIndexer.indexOf(byteChunk);
 
         // 6, 匹配到了 应该终结
-        if (indexMatchResult.status== FULL_MATCH) {
+        if (indexMatchResult.status == FULL_MATCH) {
             // 匹配的长度
             var matchedLength = indexMatchResult.matchedLength;
             // 计算针对当前块来说的 安全索引.
@@ -105,7 +105,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
                 // 所以不能直接使用 i 截断, 而是应该使用 safeLength.
                 // 这里虽然本可以 判断当前 分块是否存在 有效数据(不包含 boundary 的数据) 然后 选择性 addLast.
                 // 但是为了保证 trimTailBytes 的执行逻辑简单. 这里无论当前分块是否包含 有效数据 都进行添加.
-                cache.addLast(byteChunk.subChunk(0, (int) safeLength));
+                cache.addLast(byteChunk.subChunk(0, safeLength));
                 // 这里需要 移除尾部的 boundary
                 trimTailBytes(matchedLength);
                 // 允许使用 缓存块
