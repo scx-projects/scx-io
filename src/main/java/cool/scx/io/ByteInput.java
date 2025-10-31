@@ -119,7 +119,7 @@ public interface ByteInput extends AutoCloseable {
         try {
             this.readUpTo(byteConsumer, Long.MAX_VALUE);
         } catch (NoMoreDataException _) {
-
+            // 忽略 EOF
         }
     }
 
@@ -151,7 +151,7 @@ public interface ByteInput extends AutoCloseable {
         try {
             peekUpTo(byteConsumer, Long.MAX_VALUE);
         } catch (NoMoreDataException _) {
-
+            // 忽略 EOF
         }
     }
 
