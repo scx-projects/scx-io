@@ -85,8 +85,10 @@ public interface ByteInput extends AutoCloseable {
     /// 在当前读取位置创建一个标记对象.
     ByteInputMark mark() throws AlreadyClosedException;
 
+    /// 检测当前流是否关闭
     boolean isClosed();
 
+    /// 关闭这个流, 此方法应该是幂等的.
     void close() throws ScxIOException;
 
     default byte[] read(int maxLength) throws ScxIOException, AlreadyClosedException, NoMoreDataException {
@@ -117,7 +119,7 @@ public interface ByteInput extends AutoCloseable {
         try {
             this.readUpTo(byteConsumer, Long.MAX_VALUE);
         } catch (NoMoreDataException _) {
-
+            // 忽略 EOF
         }
     }
 
@@ -149,7 +151,7 @@ public interface ByteInput extends AutoCloseable {
         try {
             peekUpTo(byteConsumer, Long.MAX_VALUE);
         } catch (NoMoreDataException _) {
-
+            // 忽略 EOF
         }
     }
 
