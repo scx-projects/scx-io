@@ -2,6 +2,8 @@ package cool.scx.io;
 
 /// ByteChunk
 ///
+/// 为了性能考虑 所有方法均没有 边界检查, 使用时请注意 参数正确
+///
 /// @author scx567888
 /// @version 0.0.1
 public final class ByteChunk {
