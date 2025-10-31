@@ -9,7 +9,7 @@ import cool.scx.io.exception.ScxIOException;
 ///
 /// @author scx567888
 /// @version 0.0.1
-public class ByteOutputByteConsumer implements ByteConsumer<RuntimeException> {
+public final class ByteOutputByteConsumer implements ByteConsumer<RuntimeException> {
 
     private final ByteOutput out;
     private long bytesWritten;

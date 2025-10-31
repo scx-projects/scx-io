@@ -11,7 +11,7 @@ import cool.scx.io.exception.ScxIOException;
 ///
 /// @author scx567888
 /// @version 0.0.1
-public class FixedLengthByteSupplier implements ByteSupplier {
+public final class FixedLengthByteSupplier implements ByteSupplier {
 
     private final ByteInput byteInput;
     private final ByteChunkByteConsumer consumer;
