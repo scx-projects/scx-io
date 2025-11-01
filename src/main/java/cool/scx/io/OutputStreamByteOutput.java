@@ -12,15 +12,16 @@ import java.io.OutputStream;
 /// @version 0.0.1
 public class OutputStreamByteOutput implements ByteOutput {
 
-    private final OutputStream outputStream;
-    private volatile boolean closed;
+    protected final OutputStream outputStream;
+
+    protected volatile boolean closed;
 
     public OutputStreamByteOutput(OutputStream outputStream) {
         this.outputStream = outputStream;
         this.closed = false;
     }
 
-    private void ensureOpen() throws AlreadyClosedException {
+    protected void ensureOpen() throws AlreadyClosedException {
         if (closed) {
             throw new AlreadyClosedException();
         }

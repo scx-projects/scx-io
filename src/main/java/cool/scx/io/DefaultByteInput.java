@@ -19,20 +19,21 @@ import static java.lang.Math.min;
 /// @version 0.0.1
 public class DefaultByteInput implements ByteInput {
 
-    private final ByteSupplier byteSupplier;
+    protected final ByteSupplier byteSupplier;
 
-    private ByteChunkNode head;
-    private ByteChunkNode tail;
+    protected ByteChunkNode head;
+    protected ByteChunkNode tail;
 
-    private volatile boolean closed;
+    protected volatile boolean closed;
 
     public DefaultByteInput(ByteSupplier byteSupplier) {
         this.byteSupplier = byteSupplier;
         this.head = new ByteChunkNode(EMPTY_BYTE_CHUNK);
         this.tail = this.head;
+        this.closed = false;
     }
 
-    private void appendByteChunk(ByteChunk byteChunk) {
+    protected void appendByteChunk(ByteChunk byteChunk) {
         tail.next = new ByteChunkNode(byteChunk);
         tail = tail.next;
     }
@@ -40,7 +41,7 @@ public class DefaultByteInput implements ByteInput {
     /// 从 byteSupplier 中持续拉取直到得到有效数据块
     ///
     /// @return EOF
-    private boolean pullByteChunk() throws ScxIOException {
+    protected boolean pullByteChunk() throws ScxIOException {
         while (true) {
             ByteChunk byteChunk;
             try {
@@ -62,7 +63,7 @@ public class DefaultByteInput implements ByteInput {
     }
 
     /// 确保 open
-    private void ensureOpen() throws AlreadyClosedException {
+    protected void ensureOpen() throws AlreadyClosedException {
         if (closed) {
             throw new AlreadyClosedException();
         }
@@ -71,7 +72,7 @@ public class DefaultByteInput implements ByteInput {
     /// 确保 有数据可用 (至少 1 字节)
     ///
     /// @return 调用了几次底层拉取
-    private long ensureAvailable() throws ScxIOException, NoMoreDataException {
+    protected long ensureAvailable() throws ScxIOException, NoMoreDataException {
         var pullCount = 0L;
         // 保证 当前 head 中至少有 1个 字节
         if (head.hasAvailable()) {
@@ -99,7 +100,7 @@ public class DefaultByteInput implements ByteInput {
      * @param <X>          用户自定义异常
      * @throws X X
      */
-    private <X extends Throwable> void read0(ByteConsumer<X> consumer, long maxLength, boolean movePointer, long maxPullCount, boolean throwOnEOF) throws X, ScxIOException, NoMoreDataException {
+    protected <X extends Throwable> void read0(ByteConsumer<X> consumer, long maxLength, boolean movePointer, long maxPullCount, boolean throwOnEOF) throws X, ScxIOException, NoMoreDataException {
 
         var remaining = maxLength; // 剩余需要读取的字节数
         var n = head; // 用于循环的节点
@@ -165,7 +166,7 @@ public class DefaultByteInput implements ByteInput {
 
     }
 
-    private ByteMatchResult indexOf0(ByteIndexer indexer, long maxLength, long maxPullCount) throws NoMatchFoundException, ScxIOException {
+    protected ByteMatchResult indexOf0(ByteIndexer indexer, long maxLength, long maxPullCount) throws NoMatchFoundException, ScxIOException {
 
         var index = 0L; // 主串索引
 
@@ -333,7 +334,7 @@ public class DefaultByteInput implements ByteInput {
         }
     }
 
-    private static class ByteChunkNode {
+    protected static class ByteChunkNode {
 
         public final ByteChunk chunk;
         /// 相对 索引 0 起始
@@ -365,8 +366,11 @@ public class DefaultByteInput implements ByteInput {
 
     }
 
-    private record DefaultByteInputMark(DefaultByteInput defaultByteInput, ByteChunkNode markNode,
-                                        int markPosition) implements ByteInputMark {
+    protected record DefaultByteInputMark(
+        DefaultByteInput defaultByteInput,
+        ByteChunkNode markNode,
+        int markPosition
+    ) implements ByteInputMark {
 
         @Override
         public void reset() throws AlreadyClosedException {

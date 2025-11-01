@@ -25,7 +25,6 @@ public final class BoundaryByteSupplier implements ByteSupplier {
     private final ByteIndexer byteIndexer;
     /// 是否在 source 中保留 Boundary
     private final boolean keepBoundaryInSource;
-    private final boolean autoClose;
     private final ByteChunkByteConsumer consumer;
     private final LinkedList<ByteChunk> cache;
     private boolean useCache;
@@ -33,14 +32,9 @@ public final class BoundaryByteSupplier implements ByteSupplier {
     private ByteInputMark mark;
 
     public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer, boolean keepBoundaryInSource) {
-        this(byteInput, byteIndexer, keepBoundaryInSource, false);
-    }
-
-    public BoundaryByteSupplier(ByteInput byteInput, ByteIndexer byteIndexer, boolean keepBoundaryInSource, boolean autoClose) {
         this.byteInput = byteInput;
         this.byteIndexer = byteIndexer;
         this.keepBoundaryInSource = keepBoundaryInSource;
-        this.autoClose = autoClose;
         this.consumer = new ByteChunkByteConsumer();
         this.cache = new LinkedList<>();
         this.useCache = false;
@@ -193,9 +187,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
 
     @Override
     public void close() throws ScxIOException {
-        if (autoClose) {
-            byteInput.close();
-        }
+        byteInput.close();
     }
 
 }

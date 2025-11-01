@@ -15,12 +15,10 @@ public final class ByteInputByteSupplier implements ByteSupplier {
 
     private final ByteInput byteInput;
     private final ByteChunkByteConsumer consumer;
-    private final boolean autoClose;
 
-    public ByteInputByteSupplier(ByteInput byteInput, boolean autoClose) {
+    public ByteInputByteSupplier(ByteInput byteInput) {
         this.byteInput = byteInput;
         this.consumer = new ByteChunkByteConsumer();
-        this.autoClose = autoClose;
     }
 
     @Override
@@ -37,9 +35,7 @@ public final class ByteInputByteSupplier implements ByteSupplier {
 
     @Override
     public void close() throws ScxIOException {
-        if (autoClose) {
-            this.byteInput.close();
-        }
+        this.byteInput.close();
     }
 
 }

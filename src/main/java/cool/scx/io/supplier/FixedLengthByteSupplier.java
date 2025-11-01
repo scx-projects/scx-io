@@ -15,18 +15,12 @@ public final class FixedLengthByteSupplier implements ByteSupplier {
 
     private final ByteInput byteInput;
     private final ByteChunkByteConsumer consumer;
-    private final boolean autoClose;
     private long remaining;
 
     public FixedLengthByteSupplier(ByteInput byteInput, long maxLength) {
-        this(byteInput, maxLength, false);
-    }
-
-    public FixedLengthByteSupplier(ByteInput byteInput, long maxLength, boolean autoClose) {
         this.byteInput = byteInput;
         this.consumer = new ByteChunkByteConsumer();
         this.remaining = maxLength;
-        this.autoClose = autoClose;
     }
 
     @Override
@@ -49,9 +43,7 @@ public final class FixedLengthByteSupplier implements ByteSupplier {
 
     @Override
     public void close() throws ScxIOException {
-        if (autoClose) {
-            this.byteInput.close();
-        }
+        this.byteInput.close();
     }
 
 }
