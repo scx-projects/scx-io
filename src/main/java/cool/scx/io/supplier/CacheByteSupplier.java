@@ -14,7 +14,7 @@ import java.util.List;
 ///
 /// @author scx567888
 /// @version 0.0.1
-public class CacheByteSupplier implements ByteSupplier {
+public final class CacheByteSupplier implements ByteSupplier {
 
     private final ByteInput byteInput;
     private final ByteChunkByteConsumer consumer;
