@@ -366,8 +366,11 @@ public class DefaultByteInput implements ByteInput {
 
     }
 
-    protected record DefaultByteInputMark(DefaultByteInput defaultByteInput, ByteChunkNode markNode,
-                                          int markPosition) implements ByteInputMark {
+    protected record DefaultByteInputMark(
+        DefaultByteInput defaultByteInput,
+        ByteChunkNode markNode,
+        int markPosition
+    ) implements ByteInputMark {
 
         @Override
         public void reset() throws AlreadyClosedException {
