@@ -10,6 +10,10 @@ import cool.scx.io.exception.ScxIOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/// CacheByteSupplier
+///
+/// @author scx567888
+/// @version 0.0.1
 public class CacheByteSupplier implements ByteSupplier {
 
     private final ByteInput byteInput;
