@@ -20,6 +20,7 @@ import static java.lang.Math.min;
 public class DefaultByteInput implements ByteInput {
 
     private final ByteSupplier byteSupplier;
+    private final boolean autoClose;
 
     private ByteChunkNode head;
     private ByteChunkNode tail;
@@ -27,9 +28,15 @@ public class DefaultByteInput implements ByteInput {
     private volatile boolean closed;
 
     public DefaultByteInput(ByteSupplier byteSupplier) {
+        this(byteSupplier, true);
+    }
+
+    public DefaultByteInput(ByteSupplier byteSupplier, boolean autoClose) {
         this.byteSupplier = byteSupplier;
+        this.autoClose = autoClose;
         this.head = new ByteChunkNode(EMPTY_BYTE_CHUNK);
         this.tail = this.head;
+        this.closed = false;
     }
 
     private void appendByteChunk(ByteChunk byteChunk) {
@@ -323,7 +330,9 @@ public class DefaultByteInput implements ByteInput {
     @Override
     public void close() throws ScxIOException {
         try {
-            byteSupplier.close();
+            if (autoClose) {
+                byteSupplier.close();
+            }
         } catch (ScxIOException e) {
             throw e;
         } catch (Exception e) {
