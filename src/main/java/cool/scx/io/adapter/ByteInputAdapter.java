@@ -1,0 +1,13 @@
+package cool.scx.io.adapter;
+
+import cool.scx.io.ByteInput;
+
+/// ByteInputAdapter
+///
+/// @author scx567888
+/// @version 0.0.1
+public interface ByteInputAdapter {
+
+    ByteInput byteInput();
+
+}

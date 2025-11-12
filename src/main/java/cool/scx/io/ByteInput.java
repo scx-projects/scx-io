@@ -1,0 +1,301 @@
+package cool.scx.io;
+
+import cool.scx.exception.ScxWrappedException;
+import cool.scx.io.consumer.ByteArrayByteConsumer;
+import cool.scx.io.consumer.ByteConsumer;
+import cool.scx.io.consumer.ByteOutputByteConsumer;
+import cool.scx.io.consumer.SkipByteConsumer;
+import cool.scx.io.exception.AlreadyClosedException;
+import cool.scx.io.exception.NoMatchFoundException;
+import cool.scx.io.exception.NoMoreDataException;
+import cool.scx.io.exception.ScxIOException;
+import cool.scx.io.indexer.ByteIndexer;
+import cool.scx.io.indexer.KMPByteIndexer;
+import cool.scx.io.indexer.SingleByteIndexer;
+
+/// ByteInput
+///
+/// 方法分为两大类, 动作方法/请求方法.
+///
+/// - 动作方法 read / readUpTo / readFully 以及相关的 peek, skip, transferTo 镜像方法.
+///   - 当 maxLength / length = 0 时, 我们将其看作一种无动作, 均采用统一策略, 立即返回, 不抛异常, 无关流的状态 (即使流以及结束).
+///   - 在 maxLength / length > 0 时, 读取操作必须产生有效数据 (至少读取一个字节), 这样保证动作不会成为空操作 并消除了 "0 字节读取歧义".
+///   - EOF (流结束) 被设计为一种明确的信号, 当无法再读取任何字节时, 会抛出 [NoMoreDataException]. 这保证循环读取的安全性和逻辑自洽性. 同时消除了 EOF 表达性歧义.
+///   - 严格契约保证用户可以安全循环读取, 同时明确何时流结束.
+///   - 方法对读取的容忍度分成三个级别:
+///     - [#read(ByteConsumer,long)] — 宽松 (可能少于指定长度)
+///     - [#readUpTo(ByteConsumer,long)] — 中等 (尽量读取指定长度)
+///     - [#readFully(ByteConsumer,long)] — 严格 (必须读取指定长度)
+///
+/// - 动作方法 indexOf.
+///   - 空匹配模式的 indexOf 看作一种无动作 (因其事实上可以匹配任何数据), 恒返回 0.
+///
+/// - 请求方法 readAll / peekAll / skipAll / transferToAll .
+///   - 和动作方法唯一的不同在于, 请求方法的调用者一般只关心结果 而不是流的结束状态, 所以即使处于 EOF 状态 也会宽松的返回结果 (空数组 或 0 等).
+///
+/// - 注意 1 : ByteInput 的 close() 为非幂等操作, 重复 close 将抛 AlreadyClosedException.
+/// - 注意 2 : 支持传入 byteConsumer 的方法 (如 read, peek) 中. 如果 byteConsumer 本身发生了会和 read 本身混淆的异常(比如 AlreadyClosedException) 则会被包裹为 [cool.scx.exception.ScxWrappedException].
+///
+/// @author scx567888
+/// @version 0.0.1
+public interface ByteInput extends AutoCloseable {
+
+    /// 读取单个字节
+    /// - 如果 当前没有数据可读 (立即遇到 EOF), 则会抛出 NoMoreDataException
+    byte read() throws NoMoreDataException, ScxIOException, AlreadyClosedException;
+
+    /// 最多读取 maxLength 个字节, 可能少于 maxLength (即使尚未遇到 EOF, 如底层缓冲区不足)
+    /// - 如果 maxLength = 0, 立即返回 (不抛出异常, 即使在 EOF 状态)
+    /// - 如果 maxLength > 0, 至少读取 1 个字节.
+    ///   - 如果 数据不足 (读取过程中遇到 EOF), 则停止读取
+    ///   - 如果 当前没有数据可读 (立即遇到 EOF), 则会抛出 NoMoreDataException
+    <X extends Throwable> void read(ByteConsumer<X> byteConsumer, long maxLength) throws NoMoreDataException, ScxIOException, AlreadyClosedException, X, ScxWrappedException;
+
+    /// 尽量读取 length 个字节, 可能少于 length (仅在 EOF 时发生)
+    /// - 如果 length = 0, 立即返回 (不抛出异常, 即使在 EOF 状态)
+    /// - 如果 length > 0, 至少读取 1 个字节.
+    ///   - 如果 数据不足 (读取过程中遇到 EOF), 则停止读取
+    ///   - 如果 当前没有数据可读 (立即遇到 EOF), 则会抛出 NoMoreDataException
+    <X extends Throwable> void readUpTo(ByteConsumer<X> byteConsumer, long length) throws NoMoreDataException, ScxIOException, AlreadyClosedException, X, ScxWrappedException;
+
+    /// 恰好读取 length 个字节
+    /// - 如果 length = 0, 立即返回且不抛出异常 (即使在 EOF 状态)
+    /// - 如果 length > 0. 一定读取 length 个字节.
+    ///   - 如果 数据不足 (读取过程中遇到 EOF), 则会抛出 NoMoreDataException
+    ///   - 如果 当前没有数据可读 (立即遇到 EOF), 则会抛出 NoMoreDataException
+    <X extends Throwable> void readFully(ByteConsumer<X> byteConsumer, long length) throws NoMoreDataException, ScxIOException, AlreadyClosedException, X, ScxWrappedException;
+
+    /// 查看字节, 行为参考 [ByteInput#read()]
+    byte peek() throws NoMoreDataException, ScxIOException, AlreadyClosedException;
+
+    /// 查看字节, 行为参考 [ByteInput#read(ByteConsumer, long)]
+    <X extends Throwable> void peek(ByteConsumer<X> byteConsumer, long maxLength) throws NoMoreDataException, ScxIOException, AlreadyClosedException, X, ScxWrappedException;
+
+    /// 查看字节, 行为参考 [ByteInput#readUpTo(ByteConsumer, long)]
+    <X extends Throwable> void peekUpTo(ByteConsumer<X> byteConsumer, long length) throws NoMoreDataException, ScxIOException, AlreadyClosedException, X, ScxWrappedException;
+
+    /// 查看字节, 行为参考 [ByteInput#readFully(ByteConsumer, long)]
+    <X extends Throwable> void peekFully(ByteConsumer<X> byteConsumer, long length) throws NoMoreDataException, ScxIOException, AlreadyClosedException, X, ScxWrappedException;
+
+    /// 在最多 maxLength 个字节中查找匹配 (或直到 EOF).
+    /// - 如果 indexer 是 空匹配模式. (意味着没有消费数据的能力和意义)
+    ///   - 在任意情况下都返回 0. (恒为 0)
+    /// - 如果 indexer 不是 空匹配模式.
+    ///   - 如果 maxLength = 0, 抛 NoMatchFoundException (恒 NoMatch, 因为这是不可能完成的任务).
+    ///   - 如果 maxLength > 0. (正常逻辑)
+    ///     - 如果在边界达成条件内仍未匹配到 (如达到 maxLength限制 或 读取过程中遇到 EOF) 抛出 NoMatchFoundException.
+    ///     - 如果 当前没有数据可读 (立即遇到 EOF), 则会抛出 NoMoreDataException.
+    ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException;
+
+    /// 在当前读取位置创建一个标记对象.
+    ByteInputMark mark() throws AlreadyClosedException;
+
+    /// 检测当前流是否关闭
+    boolean isClosed();
+
+    /// 关闭此流, 并执行与关闭相关的所有必要行为.
+    ///
+    /// close() 不只是单纯的关闭操作:
+    /// 在某些实现中, close() 可能触发额外的有意义动作, 例如:
+    /// - 刷新缓冲区或输出最终数据
+    /// - 发送或接收协议结束标志
+    /// - 写入校验、尾块或元数据
+    /// - 提交事务性状态
+    /// - 释放底层系统资源
+    ///
+    /// 正因为 close() 可能包含这些只能发生一次的行为, 所以此处 close() 设计为一次性操作，而非幂等操作.
+    /// 若流已关闭, 重复调用 close() 属非法调用, 将抛出 AlreadyClosedException.
+    /// 若流关闭时发生异常, 将抛出 ScxIOException. 但此时不应该改变 isClosed 标识状态.
+    void close() throws ScxIOException, AlreadyClosedException;
+
+    /// 内置的 ByteArrayByteConsumer 不会抛出任何异常, 所以 此处方法签名 省略 ScxWrappedException. 其余方法同样参考此说明
+    default byte[] read(int maxLength) throws NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var consumer = new ByteArrayByteConsumer();
+        read(consumer, maxLength);
+        return consumer.bytes();
+    }
+
+    default byte[] readUpTo(int length) throws NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var consumer = new ByteArrayByteConsumer();
+        readUpTo(consumer, length);
+        return consumer.bytes();
+    }
+
+    default byte[] readFully(int length) throws NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var consumer = new ByteArrayByteConsumer();
+        readFully(consumer, length);
+        return consumer.bytes();
+    }
+
+    default byte[] readAll() throws ScxIOException, AlreadyClosedException {
+        var consumer = new ByteArrayByteConsumer();
+        readAll(consumer);
+        return consumer.bytes();
+    }
+
+    default <X extends Throwable> void readAll(ByteConsumer<X> byteConsumer) throws ScxIOException, AlreadyClosedException, X, ScxWrappedException {
+        try {
+            readUpTo(byteConsumer, Long.MAX_VALUE);
+        } catch (NoMoreDataException _) {
+            // 忽略 EOF
+        }
+    }
+
+    default byte[] peek(int maxLength) throws NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var consumer = new ByteArrayByteConsumer();
+        peek(consumer, maxLength);
+        return consumer.bytes();
+    }
+
+    default byte[] peekUpTo(int length) throws NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var consumer = new ByteArrayByteConsumer();
+        peekUpTo(consumer, length);
+        return consumer.bytes();
+    }
+
+    default byte[] peekFully(int length) throws NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var consumer = new ByteArrayByteConsumer();
+        peekFully(consumer, length);
+        return consumer.bytes();
+    }
+
+    default byte[] peekAll() throws ScxIOException, AlreadyClosedException {
+        var consumer = new ByteArrayByteConsumer();
+        peekAll(consumer);
+        return consumer.bytes();
+    }
+
+    default <X extends Throwable> void peekAll(ByteConsumer<X> byteConsumer) throws ScxIOException, AlreadyClosedException, X, ScxWrappedException {
+        try {
+            peekUpTo(byteConsumer, Long.MAX_VALUE);
+        } catch (NoMoreDataException _) {
+            // 忽略 EOF
+        }
+    }
+
+    default long skip(long maxLength) throws NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var consumer = new SkipByteConsumer();
+        read(consumer, maxLength);
+        return consumer.bytesSkipped();
+    }
+
+    default long skipUpTo(long length) throws NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var consumer = new SkipByteConsumer();
+        readUpTo(consumer, length);
+        return consumer.bytesSkipped();
+    }
+
+    default long skipFully(long length) throws NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var consumer = new SkipByteConsumer();
+        readFully(consumer, length);
+        return consumer.bytesSkipped();
+    }
+
+    default long skipAll() throws ScxIOException, AlreadyClosedException {
+        var consumer = new SkipByteConsumer();
+        readAll(consumer);
+        return consumer.bytesSkipped();
+    }
+
+    default ByteMatchResult indexOf(ByteIndexer byteIndexer) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return indexOf(byteIndexer, Long.MAX_VALUE);
+    }
+
+    default ByteMatchResult indexOf(byte b) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return indexOf(b, Long.MAX_VALUE);
+    }
+
+    default ByteMatchResult indexOf(byte b, long maxLength) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return indexOf(new SingleByteIndexer(b), maxLength);
+    }
+
+    default ByteMatchResult indexOf(byte[] b) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return indexOf(b, Long.MAX_VALUE);
+    }
+
+    default ByteMatchResult indexOf(byte[] b, long maxLength) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return indexOf(new KMPByteIndexer(b), maxLength);
+    }
+
+    default byte[] readUntil(ByteIndexer byteIndexer) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return readUntil(byteIndexer, Integer.MAX_VALUE);
+    }
+
+    /// 从当前 ByteInput 中读取数据直到 ByteIndexer 成功匹配.
+    ///
+    /// - 返回的数据 不包含模式串.
+    /// - 方法调用结束后, ByteInput 的读取指针会跳过模式串的长度, 即下一次读取从模式串之后开始.
+    default byte[] readUntil(ByteIndexer byteIndexer, int maxLength) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var indexMatchResult = indexOf(byteIndexer, maxLength);
+        var bytes = readFully((int) indexMatchResult.index);
+        skipFully(indexMatchResult.matchedLength);
+        return bytes;
+    }
+
+    default byte[] readUntil(byte b) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return readUntil(b, Integer.MAX_VALUE);
+    }
+
+    default byte[] readUntil(byte b, int maxLength) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return readUntil(new SingleByteIndexer(b), maxLength);
+    }
+
+    default byte[] readUntil(byte[] b) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return readUntil(b, Integer.MAX_VALUE);
+    }
+
+    default byte[] readUntil(byte[] b, int maxLength) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return readUntil(new KMPByteIndexer(b), maxLength);
+    }
+
+    default byte[] peekUntil(ByteIndexer byteIndexer) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return peekUntil(byteIndexer, Integer.MAX_VALUE);
+    }
+
+    default byte[] peekUntil(ByteIndexer byteIndexer, int maxLength) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        var indexMatchResult = indexOf(byteIndexer, maxLength);
+        return peekFully((int) indexMatchResult.index);
+    }
+
+    default byte[] peekUntil(byte b) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return peekUntil(b, Integer.MAX_VALUE);
+    }
+
+    default byte[] peekUntil(byte b, int maxLength) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return peekUntil(new SingleByteIndexer(b), maxLength);
+    }
+
+    default byte[] peekUntil(byte[] b) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return peekUntil(b, Integer.MAX_VALUE);
+    }
+
+    default byte[] peekUntil(byte[] b, int maxLength) throws NoMatchFoundException, NoMoreDataException, ScxIOException, AlreadyClosedException {
+        return peekUntil(new KMPByteIndexer(b), maxLength);
+    }
+
+    /// ByteOutput 中的 易混淆异常 (ScxIOException, AlreadyClosedException) 之类会被包装为 ScxWrappedException
+    default long transferTo(ByteOutput byteOutput, long maxLength) throws NoMoreDataException, ScxIOException, AlreadyClosedException, ScxWrappedException {
+        var consumer = new ByteOutputByteConsumer(byteOutput);
+        read(consumer, maxLength);
+        return consumer.bytesWritten();
+    }
+
+    default long transferToUpTo(ByteOutput byteOutput, long length) throws NoMoreDataException, ScxIOException, AlreadyClosedException, ScxWrappedException {
+        var consumer = new ByteOutputByteConsumer(byteOutput);
+        readUpTo(consumer, length);
+        return consumer.bytesWritten();
+    }
+
+    default long transferToFully(ByteOutput byteOutput, long length) throws NoMoreDataException, ScxIOException, AlreadyClosedException, ScxWrappedException {
+        var consumer = new ByteOutputByteConsumer(byteOutput);
+        readFully(consumer, length);
+        return consumer.bytesWritten();
+    }
+
+    default long transferToAll(ByteOutput byteOutput) throws ScxIOException, AlreadyClosedException, ScxWrappedException {
+        var consumer = new ByteOutputByteConsumer(byteOutput);
+        readAll(consumer);
+        return consumer.bytesWritten();
+    }
+
+}
