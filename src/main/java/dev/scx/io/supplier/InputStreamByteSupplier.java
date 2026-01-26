@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /// InputStreamByteSupplier
+///
 /// 1, 当大部分时候读取的数据长度等于 bufferLength 的时候, 性能会高一点 因为只会进行数组创建这一步
+///
 /// 2, 当大部分时候读取的数据长度小于 bufferLength 的时候, 性能会差一点 因为每次都会创建一个 bufferLength 大小的数组
-/// 如果启用压缩则会产生第二次复制 增加时间
-/// 如果未启用压缩则会造成内存上的一些浪费
+///
 /// 这时建议使用  [BufferedInputStreamByteSupplier]
 ///
 /// @author scx567888
@@ -19,24 +20,14 @@ public final class InputStreamByteSupplier implements ByteSupplier {
 
     private final InputStream inputStream;
     private final int bufferLength;
-    private final boolean compress;
 
     public InputStreamByteSupplier(InputStream inputStream) {
-        this(inputStream, 8192, false);
-    }
-
-    public InputStreamByteSupplier(InputStream inputStream, boolean compress) {
-        this(inputStream, 8192, compress);
+        this(inputStream, 8192);
     }
 
     public InputStreamByteSupplier(InputStream inputStream, int bufferLength) {
-        this(inputStream, bufferLength, false);
-    }
-
-    public InputStreamByteSupplier(InputStream inputStream, int bufferLength, boolean compress) {
         this.inputStream = inputStream;
         this.bufferLength = bufferLength;
-        this.compress = compress;
     }
 
     public ByteChunk get0() throws IOException {
@@ -49,16 +40,7 @@ public final class InputStreamByteSupplier implements ByteSupplier {
         if (i == -1) {
             return null; // end of data
         }
-        // 如果读取的数据量与缓冲区大小一致, 直接返回内部数组
-        if (i == bufferLength) {
-            return ByteChunk.of(bytes);
-        } else if (compress) {// 否则判断是否开启压缩
-            var data = new byte[i];
-            System.arraycopy(bytes, 0, data, 0, i);
-            return ByteChunk.of(data);
-        } else {// 不压缩 直接返回
-            return ByteChunk.of(bytes, 0, i);
-        }
+        return ByteChunk.of(bytes, 0, i);
     }
 
     public void close0() throws IOException {
