@@ -35,9 +35,9 @@ public final class BufferedInputStreamByteSupplier implements ByteSupplier {
         if (i == -1) {
             return null; // 数据结束
         }
-        var data = new byte[i];
-        System.arraycopy(buffer, 0, data, 0, i); // 复制数据到新的数组
-        return ByteChunk.of(data);
+        var bytes = new byte[i];
+        System.arraycopy(buffer, 0, bytes, 0, i); // 复制数据到新的数组
+        return ByteChunk.of(bytes);
     }
 
     public void close0() throws IOException {
