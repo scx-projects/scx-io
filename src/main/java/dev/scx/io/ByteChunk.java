@@ -28,6 +28,14 @@ public final class ByteChunk {
         this.length = end - start;
     }
 
+    public static ByteChunk of(byte... bytes) {
+        return new ByteChunk(bytes, 0, bytes.length);
+    }
+
+    public static ByteChunk of(byte[] bytes, int start, int end) {
+        return new ByteChunk(bytes, start, end);
+    }
+
     public byte getByte(int index) {
         return bytes[start + index];
     }
