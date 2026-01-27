@@ -35,6 +35,11 @@ public final class StatusByteMatchResult {
         return new StatusByteMatchResult(FULL_MATCH, index, matchedLength);
     }
 
+    @Override
+    public String toString() {
+        return "StatusByteMatchResult[status=" + status + ", index=" + index + ", matchedLength=" + matchedLength + ']';
+    }
+
     public enum Status {
 
         /// 完全未匹配
