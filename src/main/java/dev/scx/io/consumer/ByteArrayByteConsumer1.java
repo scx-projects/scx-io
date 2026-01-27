@@ -12,7 +12,8 @@ import java.util.Arrays;
 /// @version 0.0.1
 public final class ByteArrayByteConsumer1 implements ByteConsumer {
 
-    public static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
+    private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
+
     private byte[] bytes;
     private int total;
 
