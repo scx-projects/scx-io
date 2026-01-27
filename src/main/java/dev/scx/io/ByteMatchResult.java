@@ -14,4 +14,9 @@ public final class ByteMatchResult {
         this.matchedLength = matchedLength;
     }
 
+    @Override
+    public String toString() {
+        return "ByteMatchResult[index=" + index + ", matchedLength=" + matchedLength + ']';
+    }
+
 }
