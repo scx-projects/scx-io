@@ -60,6 +60,10 @@ public final class ByteArrayByteConsumer implements ByteConsumer {
         return bytes;
     }
 
+    public int size() {
+        return total;
+    }
+
     private static class ByteChunkNode {
 
         public final ByteChunk chunk;
