@@ -43,6 +43,11 @@ public final class KMPByteIndexer implements ByteIndexer {
         return lps;
     }
 
+    /// 前提条件:
+    /// - pattern.length > 0
+    /// - 空匹配模式不在本实现的处理范围内, 必须由调用者提前判断, 例如通过 isEmptyPattern().
+    ///
+    /// 若违反此前提, indexOf 的行为未定义.
     @Override
     public StatusByteMatchResult indexOf(ByteChunk chunk) {
 
