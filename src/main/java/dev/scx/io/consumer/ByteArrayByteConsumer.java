@@ -2,7 +2,7 @@ package dev.scx.io.consumer;
 
 import dev.scx.io.ByteChunk;
 
-/// LazyByteArrayByteConsumer
+/// ByteArrayByteConsumer
 ///
 /// @author scx567888
 /// @version 0.0.1
