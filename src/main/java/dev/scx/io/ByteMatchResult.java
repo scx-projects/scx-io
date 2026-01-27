@@ -7,7 +7,6 @@ package dev.scx.io;
 public final class ByteMatchResult {
 
     public final long index;
-
     public final int matchedLength;
 
     public ByteMatchResult(long index, int matchedLength) {
