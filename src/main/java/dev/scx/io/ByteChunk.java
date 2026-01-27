@@ -14,7 +14,7 @@ package dev.scx.io;
 /// @version 0.0.1
 public final class ByteChunk {
 
-    public static final ByteChunk EMPTY_BYTE_CHUNK = ByteChunk.of();
+    public static final ByteChunk EMPTY_BYTE_CHUNK = new ByteChunk(new byte[0], 0, 0);
 
     public final byte[] bytes;
     public final int start;
@@ -28,7 +28,7 @@ public final class ByteChunk {
         this.length = end - start;
     }
 
-    public static ByteChunk of(byte... bytes) {
+    public static ByteChunk of(byte[] bytes) {
         return new ByteChunk(bytes, 0, bytes.length);
     }
 
@@ -37,7 +37,7 @@ public final class ByteChunk {
     }
 
     public byte getByte(int index) {
-        return bytes[start + index];
+        return this.bytes[this.start + index];
     }
 
     public byte[] getBytes(int start, int end) {
@@ -50,11 +50,11 @@ public final class ByteChunk {
     }
 
     public byte[] getBytes() {
-        return getBytes(0, length);
+        return getBytes(0, this.length);
     }
 
     public String toString(int start, int end) {
-        return new String(bytes, this.start + start, end - start);
+        return new String(this.bytes, this.start + start, end - start);
     }
 
     @Override
