@@ -24,7 +24,7 @@ public class GzipByteOutputTest {
 
         var byteOutput = ScxIO.gzipByteOutput(gzipByteOutput);
 
-        byteOutput.write(ByteChunk.of("abcd"));
+        byteOutput.write(ByteChunk.of("abcd".getBytes()));
 
         Assert.assertEquals(bao.toByteArray(), new byte[]{31, -117, 8, 0, 0, 0, 0, 0, 0, -1});
 

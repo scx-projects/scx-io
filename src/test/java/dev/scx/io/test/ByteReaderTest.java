@@ -77,7 +77,7 @@ public class ByteReaderTest {
     @Test
     public static void test3() {
         //测试资源耗尽攻击
-        var dataReader = new DefaultByteInput(() -> ByteChunk.of("aaaaaa"));
+        var dataReader = new DefaultByteInput(() -> ByteChunk.of("aaaaaa".getBytes()));
         //最大只搜索 100 字节
         Assert.assertThrows(NoMatchFoundException.class, () -> {
             byte[] bytes = dataReader.readUntil("\r\n".getBytes(), 100);
