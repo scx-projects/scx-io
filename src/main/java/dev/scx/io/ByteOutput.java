@@ -38,8 +38,4 @@ public interface ByteOutput extends AutoCloseable {
         write(ByteChunk.of(b));
     }
 
-    default void write(byte[] b, int off, int len) throws ScxOutputException, OutputAlreadyClosedException {
-        write(ByteChunk.of(b, off, off + len));
-    }
-
 }
