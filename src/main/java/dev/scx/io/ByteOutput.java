@@ -34,12 +34,8 @@ public interface ByteOutput extends AutoCloseable {
     /// 若流关闭时发生异常, 将抛出 [ScxOutputException]. 但此时不应该改变 isClosed 标识状态.
     void close() throws ScxOutputException, OutputAlreadyClosedException;
 
-    default void write(byte... b) throws ScxOutputException, OutputAlreadyClosedException {
+    default void write(byte[] b) throws ScxOutputException, OutputAlreadyClosedException {
         write(ByteChunk.of(b));
-    }
-
-    default void write(int b) throws ScxOutputException, OutputAlreadyClosedException {
-        write((byte) b);
     }
 
 }

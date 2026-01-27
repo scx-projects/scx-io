@@ -20,9 +20,9 @@ public interface ByteSupplier extends AutoCloseable {
     ///
     /// - 必须是推进式的阻塞拉取
     /// - 如果当前已经读取到有效数据 -> 返回 ByteChunk(len > 0)
-    /// - 如果暂时无法输出数据, 但 I/O 状态确实推进了 -> 返回 EMPTY_BYTE_CHUNK
+    /// - 如果暂时无法输出数据, 但 I/O 状态确实推进了 -> 返回 [ByteChunk#EMPTY_BYTE_CHUNK]
     /// - 如果 EOF 且不会再产生数据 -> 返回 null
-    /// - 不允许无状态的空循环: 供应者不得无意义地连续返回 EMPTY_BYTE_CHUNK
+    /// - 不允许无状态的空循环: 供应者不得无意义地连续返回 [ByteChunk#EMPTY_BYTE_CHUNK]
     /// - 连续多次调用 get() 必须使底层数据源或解码状态单调推进
     /// - 为了防止 异常冲突 get 不允许抛出任何易混淆异常 如 [InputAlreadyClosedException].
     ByteChunk get() throws ScxInputException;

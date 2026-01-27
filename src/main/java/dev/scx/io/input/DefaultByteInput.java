@@ -353,7 +353,7 @@ public final class DefaultByteInput extends AbstractByteInput {
 
         @Override
         public String toString() {
-            return chunk.toString(position);
+            return chunk.toString(position, chunk.length);
         }
 
     }

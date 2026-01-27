@@ -1,21 +1,25 @@
 package dev.scx.io.output;
 
 import dev.scx.io.ByteChunk;
-import dev.scx.io.consumer.ByteArrayByteConsumer;
+import dev.scx.io.consumer.EagerByteArrayByteConsumer;
 import dev.scx.io.exception.OutputAlreadyClosedException;
 
-/// ByteArrayByteOutput
+/// EagerByteArrayByteOutput
 ///
-/// 这里直接借用 [ByteArrayByteConsumer] 来实现
+/// 这里直接借用 [EagerByteArrayByteConsumer] 来实现
 ///
 /// @author scx567888
 /// @version 0.0.1
-public final class ByteArrayByteOutput extends AbstractByteOutput {
+public final class EagerByteArrayByteOutput extends AbstractByteOutput {
 
-    private final ByteArrayByteConsumer byteConsumer;
+    private final EagerByteArrayByteConsumer byteConsumer;
 
-    public ByteArrayByteOutput() {
-        this.byteConsumer = new ByteArrayByteConsumer();
+    public EagerByteArrayByteOutput() {
+        this.byteConsumer = new EagerByteArrayByteConsumer();
+    }
+
+    public EagerByteArrayByteOutput(int size) {
+        this.byteConsumer = new EagerByteArrayByteConsumer(size);
     }
 
     @Override
@@ -42,6 +46,10 @@ public final class ByteArrayByteOutput extends AbstractByteOutput {
         ensureOpen();
 
         closed = true;
+    }
+
+    public ByteChunk chunk() {
+        return byteConsumer.chunk();
     }
 
     public byte[] bytes() {

@@ -85,7 +85,7 @@ public class ByteInputInputStream extends InputStream implements ByteInputAdapte
             }
             throw e;
         } catch (NoMoreDataException e) {
-            return new byte[]{};
+            return new byte[0];
         }
     }
 

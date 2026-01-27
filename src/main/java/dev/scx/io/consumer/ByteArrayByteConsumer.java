@@ -20,7 +20,6 @@ public final class ByteArrayByteConsumer implements ByteConsumer {
 
     @Override
     public boolean accept(ByteChunk byteChunk) {
-        total += byteChunk.length;
         var dataNode = new ByteChunkNode(byteChunk);
         if (head == null) {
             head = dataNode;
@@ -29,6 +28,7 @@ public final class ByteArrayByteConsumer implements ByteConsumer {
             tail.next = dataNode;
             tail = tail.next;
         }
+        total += byteChunk.length;
         return true;
     }
 
@@ -58,6 +58,10 @@ public final class ByteArrayByteConsumer implements ByteConsumer {
         } while (node != null);
 
         return bytes;
+    }
+
+    public int size() {
+        return total;
     }
 
     private static class ByteChunkNode {
