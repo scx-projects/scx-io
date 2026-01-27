@@ -4,7 +4,7 @@ import dev.scx.io.ByteChunk;
 
 import java.util.Arrays;
 
-/// ByteArrayByteConsumer
+/// EagerByteArrayByteConsumer
 ///
 /// 逻辑来自 [java.io.ByteArrayOutputStream].
 ///

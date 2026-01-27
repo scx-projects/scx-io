@@ -48,4 +48,8 @@ public final class ByteArrayByteOutput extends AbstractByteOutput {
         return byteConsumer.bytes();
     }
 
+    public int size() {
+        return byteConsumer.size();
+    }
+
 }
