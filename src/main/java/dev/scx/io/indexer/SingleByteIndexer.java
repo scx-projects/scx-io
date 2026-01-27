@@ -19,7 +19,7 @@ public final class SingleByteIndexer implements ByteIndexer {
 
     @Override
     public StatusByteMatchResult indexOf(ByteChunk chunk) {
-        //普通 查找
+        // 普通 查找
         for (var i = 0; i < chunk.length; i = i + 1) {
             if (chunk.getByte(i) == b) {
                 return fullMatch(i, 1);
