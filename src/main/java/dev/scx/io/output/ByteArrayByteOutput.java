@@ -6,7 +6,7 @@ import dev.scx.io.exception.OutputAlreadyClosedException;
 
 /// ByteArrayByteOutput
 ///
-/// 这里直接借用 ByteArrayByteConsumer 来实现
+/// 这里直接借用 [ByteArrayByteConsumer] 来实现
 ///
 /// @author scx567888
 /// @version 0.0.1
@@ -22,7 +22,7 @@ public final class ByteArrayByteOutput extends AbstractByteOutput {
     public void write(byte b) throws OutputAlreadyClosedException {
         ensureOpen();
 
-        byteConsumer.accept(ByteChunk.of(b));
+        byteConsumer.accept(ByteChunk.of(new byte[]{b}));
     }
 
     @Override
