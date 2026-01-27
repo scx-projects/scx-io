@@ -3,6 +3,7 @@ package dev.scx.io.consumer;
 import dev.scx.io.ByteChunk;
 
 /// FillByteArrayByteConsumer
+///
 /// 严格填充 byte[] 的消费者.
 ///
 /// 约定:
