@@ -10,39 +10,40 @@ import java.util.zip.Deflater;
 
 public final class GZIPByteOutput extends AbstractByteOutput {
 
-    private static final int DEFAULT_BUF_SIZE = 512;
+    private static final int DEFAULT_BUFFER_LENGTH = 1024;
     private static final int SYNC_FLUSH_MIN_BUF_SIZE = 7;
     private static final int GZIP_MAGIC = 0x8b1f;
     private static final byte OS_UNKNOWN = (byte) 255;
 
     private final ByteOutput out;
     private final Deflater def;
-    private final byte[] buf;
+    private final byte[] buffer;
     private final boolean syncFlush;
     private final CRC32 crc;
 
     private boolean headerWritten;
-    private boolean closed;
 
     public GZIPByteOutput(ByteOutput out) throws ScxOutputException, OutputAlreadyClosedException {
-        this(out, DEFAULT_BUF_SIZE, false);
+        this(out, DEFAULT_BUFFER_LENGTH, false);
     }
 
-    public GZIPByteOutput(ByteOutput out, int size) throws ScxOutputException, OutputAlreadyClosedException {
-        this(out, size, false);
+    public GZIPByteOutput(ByteOutput out, int bufferLength) throws ScxOutputException, OutputAlreadyClosedException {
+        this(out, bufferLength, false);
     }
 
     public GZIPByteOutput(ByteOutput out, boolean syncFlush) throws ScxOutputException, OutputAlreadyClosedException {
-        this(out, DEFAULT_BUF_SIZE, syncFlush);
+        this(out, DEFAULT_BUFFER_LENGTH, syncFlush);
     }
 
-    public GZIPByteOutput(ByteOutput out, int size, boolean syncFlush) throws ScxOutputException, OutputAlreadyClosedException {
+    public GZIPByteOutput(ByteOutput out, int bufferLength, boolean syncFlush) throws ScxOutputException, OutputAlreadyClosedException {
+        if (bufferLength <= 0) {
+            throw new IllegalArgumentException("bufferLength must be greater than 0");
+        }
         this.out = out;
         this.def = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-        this.buf = new byte[size];
+        this.buffer = new byte[bufferLength];
         this.syncFlush = syncFlush;
         this.crc = new CRC32();
-        this.crc.reset();
         this.headerWritten = false;
         this.closed = false;
     }
@@ -54,32 +55,21 @@ public final class GZIPByteOutput extends AbstractByteOutput {
 
     @Override
     public void write(ByteChunk byteChunk) throws ScxOutputException, OutputAlreadyClosedException {
-
         ensureOpen();
 
         ensureHeader();
-
-        var b = byteChunk.bytes;
-        var off = byteChunk.start;
-        var len = byteChunk.length;
 
         if (def.finished()) {
             throw new ScxOutputException("write beyond end of stream");
         }
 
-        if ((off | len | (off + len) | (b.length - (off + len))) < 0) {
-            throw new IndexOutOfBoundsException();
-        } else if (len == 0) {
-            return;
-        }
+        // 设置输入
+        def.setInput(byteChunk.bytes, byteChunk.start, byteChunk.length);
 
-        if (!def.finished()) {
-            def.setInput(b, off, len);
-            while (!def.needsInput()) {
-                int alen = def.deflate(buf, 0, buf.length);
-                if (alen > 0) {
-                    out.write(ByteChunk.of(buf, 0, alen));
-                }
+        while (!def.needsInput()) {
+            int len = def.deflate(buffer, 0, buffer.length, Deflater.NO_FLUSH);
+            if (len > 0) {
+                out.write(ByteChunk.of(buffer, 0, len));
             }
         }
 
@@ -94,21 +84,16 @@ public final class GZIPByteOutput extends AbstractByteOutput {
         ensureHeader();
 
         if (syncFlush && !def.finished()) {
-            int len = 0;
-            // For SYNC_FLUSH, the Deflater.deflate() expects the callers
-            // to use a buffer whose length is greater than 6 to avoid
-            // flush marker (5 bytes) being repeatedly output to the output buffer
-            // every time it is invoked.
-            final byte[] flushBuf = buf.length < SYNC_FLUSH_MIN_BUF_SIZE
-                ? new byte[DEFAULT_BUF_SIZE]
-                : buf;
-            while ((len = def.deflate(flushBuf, 0, flushBuf.length, Deflater.SYNC_FLUSH)) > 0) {
-                out.write(ByteChunk.of(flushBuf, 0, len));
-                if (len < flushBuf.length) {
+            while (true) {
+                var len = def.deflate(buffer, 0, buffer.length, Deflater.SYNC_FLUSH);
+                if (len > 0) {
+                    out.write(ByteChunk.of(buffer, 0, len));
+                } else {
                     break;
                 }
             }
         }
+
         out.flush();
     }
 
@@ -127,9 +112,9 @@ public final class GZIPByteOutput extends AbstractByteOutput {
                 def.finish();
 
                 while (!def.finished()) {
-                    int len = def.deflate(buf, 0, buf.length);
+                    int len = def.deflate(buffer, 0, buffer.length);
                     if (len > 0) {
-                        out.write(ByteChunk.of(buf, 0, len));
+                        out.write(ByteChunk.of(buffer, 0, len));
                     }
                 }
 
