@@ -8,13 +8,15 @@ import java.util.List;
 
 /// ByteArrayByteSupplier
 ///
+/// 不会拷贝底层 byte[] 数组.
+///
 /// @author scx567888
 /// @version 0.0.1
 public final class ByteArrayByteSupplier implements ByteSupplier {
 
     private final Iterator<byte[]> byteArrayIterator;
 
-    public ByteArrayByteSupplier(Collection<byte[]> byteArrays) {
+    public ByteArrayByteSupplier(Iterable<byte[]> byteArrays) {
         this.byteArrayIterator = byteArrays.iterator();
     }
 
@@ -25,7 +27,7 @@ public final class ByteArrayByteSupplier implements ByteSupplier {
     @Override
     public ByteChunk get() {
         if (byteArrayIterator.hasNext()) {
-            byte[] nextArray = byteArrayIterator.next();
+            var nextArray = byteArrayIterator.next();
             return ByteChunk.of(nextArray);
         }
         return null; // 没有更多字节数组时返回 null
