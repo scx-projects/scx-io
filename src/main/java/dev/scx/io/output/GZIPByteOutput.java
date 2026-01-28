@@ -24,19 +24,19 @@ public final class GZIPByteOutput extends AbstractByteOutput {
 
     private boolean headerWritten;
 
-    public GZIPByteOutput(ByteOutput out) throws ScxOutputException, OutputAlreadyClosedException {
+    public GZIPByteOutput(ByteOutput out) {
         this(out, 1024, false);
     }
 
-    public GZIPByteOutput(ByteOutput out, int bufferLength) throws ScxOutputException, OutputAlreadyClosedException {
+    public GZIPByteOutput(ByteOutput out, int bufferLength) {
         this(out, bufferLength, false);
     }
 
-    public GZIPByteOutput(ByteOutput out, boolean syncFlush) throws ScxOutputException, OutputAlreadyClosedException {
+    public GZIPByteOutput(ByteOutput out, boolean syncFlush) {
         this(out, 1024, syncFlush);
     }
 
-    public GZIPByteOutput(ByteOutput out, int bufferLength, boolean syncFlush) throws ScxOutputException, OutputAlreadyClosedException {
+    public GZIPByteOutput(ByteOutput out, int bufferLength, boolean syncFlush) {
         if (bufferLength <= 0) {
             throw new IllegalArgumentException("bufferLength must be greater than 0");
         }
