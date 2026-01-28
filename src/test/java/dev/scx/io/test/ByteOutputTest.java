@@ -2,7 +2,7 @@ package dev.scx.io.test;
 
 import dev.scx.io.exception.OutputAlreadyClosedException;
 import dev.scx.io.exception.ScxOutputException;
-import dev.scx.io.output.ByteArrayByteOutput;
+import dev.scx.io.output.LazyByteArrayByteOutput;
 import dev.scx.io.output.LengthBoundedByteOutput;
 import dev.scx.io.output.NoCloseByteOutput;
 import org.testng.Assert;
@@ -19,7 +19,7 @@ public class ByteOutputTest {
 
     @Test
     public static void test1() throws OutputAlreadyClosedException, ScxOutputException {
-        var defaultByteOutput = new ByteArrayByteOutput();
+        var defaultByteOutput = new LazyByteArrayByteOutput();
         try (defaultByteOutput) {
 
             defaultByteOutput.write("abc".getBytes());
@@ -35,7 +35,7 @@ public class ByteOutputTest {
 
     @Test
     public static void test2() throws OutputAlreadyClosedException, ScxOutputException {
-        var defaultByteOutput = new ByteArrayByteOutput();
+        var defaultByteOutput = new LazyByteArrayByteOutput();
         var lengthBoundedOutput = new LengthBoundedByteOutput(defaultByteOutput, 6, 6);
         // 测试多写入
         try (lengthBoundedOutput) {
@@ -50,7 +50,7 @@ public class ByteOutputTest {
 
     @Test
     public static void test3() {
-        var defaultByteOutput = new ByteArrayByteOutput();
+        var defaultByteOutput = new LazyByteArrayByteOutput();
         var lengthBoundedOutput = new LengthBoundedByteOutput(defaultByteOutput, 6, 6);
         //测试少写入
         Assert.assertThrows(ScxOutputException.class, () -> {
@@ -65,7 +65,7 @@ public class ByteOutputTest {
 
     @Test
     public static void test4() throws OutputAlreadyClosedException, ScxOutputException {
-        var defaultByteOutput = new ByteArrayByteOutput();
+        var defaultByteOutput = new LazyByteArrayByteOutput();
         var noCloseOutput = new NoCloseByteOutput(defaultByteOutput);
         //测试 不关闭
 
