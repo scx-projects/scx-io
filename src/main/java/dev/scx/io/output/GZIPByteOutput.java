@@ -98,46 +98,27 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     public void close() throws ScxOutputException, OutputAlreadyClosedException {
         ensureOpen();
 
-        closed = true;
-        ScxOutputException finishException = null;
         try {
-            if (def.finished()) {
-                return;
-            }
 
-            try {
-                def.finish();
+            ensureHeader();
 
-                while (!def.finished()) {
-                    int len = def.deflate(buffer, 0, buffer.length);
-                    if (len > 0) {
-                        out.write(ByteChunk.of(buffer, 0, len));
-                    }
+            def.finish();
+
+            while (!def.finished()) {
+                int len = def.deflate(buffer, 0, buffer.length, Deflater.NO_FLUSH);
+                if (len > 0) {
+                    out.write(ByteChunk.of(buffer, 0, len));
                 }
-
-                out.write(createTrailer());
-            } catch (ScxOutputException | OutputAlreadyClosedException e) {
-                def.end();
-                throw e;
             }
-        } catch (ScxOutputException ioe) {
-            finishException = ioe;
-            throw ioe;
+
+            out.write(createTrailer());
+            out.close();
+
+            closed = true;
         } finally {
             def.end();
-            if (finishException == null) {
-                out.close();
-            } else {
-                try {
-                    out.close();
-                } catch (ScxOutputException ioe) {
-                    if (finishException != ioe) {
-                        ioe.addSuppressed(finishException);
-                    }
-                    throw ioe;
-                }
-            }
         }
+
     }
 
     /// Writes GZIP member header.
