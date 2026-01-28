@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 /// EagerByteArrayByteConsumer
 ///
-/// 逻辑来自 [java.io.ByteArrayOutputStream].
+/// 逻辑参考 [java.io.ByteArrayOutputStream].
 ///
 /// @author scx567888
 /// @version 0.0.1
