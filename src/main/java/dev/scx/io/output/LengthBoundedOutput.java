@@ -23,6 +23,12 @@ public final class LengthBoundedOutput implements ByteOutput {
         this.bytesWritten = 0;
     }
 
+    private void ensureOpen() {
+        if (byteOutput.isClosed()) {
+            throw new OutputAlreadyClosedException();
+        }
+    }
+
     private void ensureMax(int length) throws ScxOutputException {
         if (bytesWritten + length > maxLength) {
             throw new ScxOutputException("写入超出最大长度: 已写入 " + bytesWritten + ", 本次写入 " + length + ", 最大允许 " + maxLength);
@@ -37,6 +43,7 @@ public final class LengthBoundedOutput implements ByteOutput {
 
     @Override
     public void write(byte b) throws ScxOutputException, OutputAlreadyClosedException {
+        ensureOpen();
         ensureMax(1);
         byteOutput.write(b);
         bytesWritten += 1;
@@ -44,6 +51,7 @@ public final class LengthBoundedOutput implements ByteOutput {
 
     @Override
     public void write(ByteChunk b) throws ScxOutputException, OutputAlreadyClosedException {
+        ensureOpen();
         ensureMax(b.length);
         byteOutput.write(b);
         bytesWritten += b.length;
@@ -61,6 +69,7 @@ public final class LengthBoundedOutput implements ByteOutput {
 
     @Override
     public void close() throws ScxOutputException, OutputAlreadyClosedException {
+        ensureOpen();
         ensureMin();
         byteOutput.close();
     }
