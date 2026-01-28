@@ -60,13 +60,16 @@ public final class GZIPByteOutput extends AbstractByteOutput {
 
         ensureHeader();
 
-        if (def.finished()) {
-            throw new ScxOutputException("write beyond end of stream");
+        ensureNotFinished();
+
+        if (byteChunk.length == 0) {
+            return;
         }
 
         // 设置输入
         def.setInput(byteChunk.bytes, byteChunk.start, byteChunk.length);
 
+        // 如果能够写出就尝试写出.
         while (!def.needsInput()) {
             int len = def.deflate(buffer, 0, buffer.length, Deflater.NO_FLUSH);
             if (len > 0) {
@@ -102,7 +105,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     public void close() throws ScxOutputException, OutputAlreadyClosedException {
         ensureOpen();
 
-        try(def) {
+        try (def) {
 
             ensureHeader();
 
@@ -131,6 +134,12 @@ public final class GZIPByteOutput extends AbstractByteOutput {
         }
         out.write(createHeader());
         headerWritten = true;
+    }
+
+    private void ensureNotFinished() {
+        if (def.finished()) {
+            throw new ScxOutputException("write beyond end of stream");
+        }
     }
 
     private byte[] createHeader() {
