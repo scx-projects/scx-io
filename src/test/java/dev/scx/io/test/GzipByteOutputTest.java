@@ -28,7 +28,7 @@ public class GzipByteOutputTest {
         byteOutput.write(new byte[0]);
 
         for (int i = 0; i < 1000; i++) {
-            byteOutput.write(ByteChunk.of(("abcd" + i).getBytes()));
+            byteOutput.write(("abcd" + i).getBytes());
         }
 
         // 测试 空块写入
