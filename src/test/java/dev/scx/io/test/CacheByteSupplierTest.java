@@ -8,8 +8,6 @@ import dev.scx.io.supplier.CacheByteSupplier;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import static dev.scx.io.supplier.ClosePolicyByteSupplier.singleClose;
-
 public class CacheByteSupplierTest {
 
     public static void main(String[] args) throws InputAlreadyClosedException, ScxInputException {
@@ -20,17 +18,15 @@ public class CacheByteSupplierTest {
     public static void test1() throws InputAlreadyClosedException, ScxInputException {
         var rawInput = ScxIO.createByteInput("123456789abc".getBytes());
 
-        // cacheByteSupplier 往往需要和 singleCloseSupplier 组合使用
         var cacheByteSupplier = new CacheByteSupplier(rawInput);
-        var singleCloseSupplier = singleClose(cacheByteSupplier);
 
-        var cacheInput1 = new DefaultByteInput(singleCloseSupplier);
+        var cacheInput1 = new DefaultByteInput(cacheByteSupplier);
         var bytes1 = new String(cacheInput1.readAll());
         cacheInput1.close();
 
         cacheByteSupplier.reset();
 
-        var cacheInput2 = new DefaultByteInput(singleCloseSupplier);
+        var cacheInput2 = new DefaultByteInput(cacheByteSupplier);
         var bytes2 = new String(cacheInput2.readAll());
         cacheInput2.close();
 

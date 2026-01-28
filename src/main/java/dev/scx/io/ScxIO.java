@@ -88,14 +88,17 @@ public final class ScxIO {
         return new OutputStreamByteOutput(outputStream);
     }
 
+    /// 隔离底层 close.
     public static ByteSupplier noClose(ByteSupplier byteSupplier) {
         return new NoCloseByteSupplier(byteSupplier);
     }
 
+    /// close 时排空, 同时会穿透底层 close.
     public static ByteSupplier drainOnClose(ByteSupplier byteSupplier) {
         return new DrainOnCloseByteSupplier(byteSupplier);
     }
 
+    /// close 时排空, 但是隔离底层 close.
     public static ByteSupplier drainOnCloseNoClose(ByteSupplier byteSupplier) {
         return new DrainOnCloseByteSupplier(new NoCloseByteSupplier(byteSupplier));
     }
