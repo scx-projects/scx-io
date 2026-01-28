@@ -169,9 +169,7 @@ public final class GZIPByteOutput implements ByteOutput {
         }
     }
 
-    /*
-     * Writes GZIP member header.
-     */
+    /// Writes GZIP member header.
     private void writeHeader() throws ScxOutputException, OutputAlreadyClosedException {
         out.write(new byte[]{
             (byte) GZIP_MAGIC,        // Magic number (short)
@@ -187,10 +185,7 @@ public final class GZIPByteOutput implements ByteOutput {
         });
     }
 
-    /*
-     * Writes GZIP member trailer to a byte array, starting at a given
-     * offset.
-     */
+    /// Writes GZIP member trailer to a byte array, starting at a given offset.
     private void writeTrailer(byte[] buf, int offset) {
         // CRC-32 of uncompr. data
         int crc32 = (int) crc.getValue();
