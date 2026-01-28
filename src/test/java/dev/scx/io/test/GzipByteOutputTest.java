@@ -27,7 +27,10 @@ public class GzipByteOutputTest {
         // 测试 空块写入
         byteOutput.write(new byte[0]);
 
-        byteOutput.write(ByteChunk.of("abcd".getBytes()));
+        for (int i = 0; i < 1000; i++) {
+            byteOutput.write(ByteChunk.of(("abcd"+i).getBytes()));
+        }
+
         // 测试 空块写入
         byteOutput.write(new byte[0]);
 
@@ -39,7 +42,9 @@ public class GzipByteOutputTest {
         // 测试 空块写入
         gba.write(new byte[0]);
 
-        gba.write("abcd".getBytes());
+        for (int i = 0; i < 1000; i++) {
+            gba.write(("abcd"+i).getBytes());
+        }
         // 测试 空块写入
         gba.write(new byte[0]);
 
