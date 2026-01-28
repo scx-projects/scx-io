@@ -102,7 +102,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     public void close() throws ScxOutputException, OutputAlreadyClosedException {
         ensureOpen();
 
-        try {
+        try(def) {
 
             ensureHeader();
 
@@ -118,10 +118,9 @@ public final class GZIPByteOutput extends AbstractByteOutput {
             out.write(createTrailer());
             out.close();
 
-            closed = true;
-        } finally {
-            def.end();
         }
+
+        closed = true;
 
     }
 
