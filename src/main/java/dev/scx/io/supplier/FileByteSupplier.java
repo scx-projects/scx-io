@@ -36,6 +36,9 @@ public final class FileByteSupplier implements ByteSupplier {
         if (offset < 0 || length < 0 || offset + length > file.length()) {
             throw new IllegalArgumentException("offset/length out of file bounds");
         }
+        if (bufferLength <= 0) {
+            throw new IllegalArgumentException("bufferLength must be greater than 0");
+        }
         this.bufferLength = bufferLength;
         this.remaining = length;
         try {
@@ -49,13 +52,14 @@ public final class FileByteSupplier implements ByteSupplier {
     }
 
     public ByteChunk get0() throws IOException {
+        // 读取够了
         if (remaining <= 0) {
             return null;
         }
         // 这里每次都创建一个 byte 数组的原因参考 InputStreamByteSupplier
-        var bytes = new byte[bufferLength];
+        var bytes = new byte[(int) min(bufferLength, remaining)];
         // 读取
-        int i = randomAccessFile.read(bytes, 0, (int) min(bufferLength, remaining));
+        int i = randomAccessFile.read(bytes);
         if (i == -1) {
             return null; // 处理文件结束情况
         }
