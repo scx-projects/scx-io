@@ -5,8 +5,8 @@ import dev.scx.io.adapter.ByteInputInputStream;
 import dev.scx.io.adapter.ByteOutputAdapter;
 import dev.scx.io.adapter.ByteOutputOutputStream;
 import dev.scx.io.exception.ScxInputException;
-import dev.scx.io.exception.ScxOutputException;
 import dev.scx.io.input.DefaultByteInput;
+import dev.scx.io.output.GZIPByteOutput;
 import dev.scx.io.output.OutputStreamByteOutput;
 import dev.scx.io.supplier.*;
 
@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /// ScxIO
 ///
@@ -55,12 +54,8 @@ public final class ScxIO {
         }
     }
 
-    public static ByteOutput gzipByteOutput(ByteOutput byteOutput) throws ScxOutputException {
-        try {
-            return ScxIO.outputStreamToByteOutput(new GZIPOutputStream(ScxIO.byteOutputToOutputStream(byteOutput)));
-        } catch (IOException e) {
-            throw new ScxOutputException(e);
-        }
+    public static ByteOutput gzipByteOutput(ByteOutput byteOutput) {
+        return new GZIPByteOutput(byteOutput);
     }
 
     public static InputStream byteInputToInputStream(ByteInput byteInput) {
