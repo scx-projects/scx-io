@@ -105,7 +105,7 @@ public interface ByteInput extends AutoCloseable {
     /// 若流关闭时发生异常, 将抛出 [ScxInputException]. 但此时不应该改变 isClosed 标识状态.
     void close() throws ScxInputException, InputAlreadyClosedException;
 
-    /// 内置的 LazyByteArrayByteConsumer 不会抛出任何异常, 所以 此处方法签名 省略 ScxWrappedException. 其余方法同样参考此说明
+    /// 内置的 [LazyByteArrayByteConsumer] 不会抛出任何异常, 所以 此处方法签名 省略 ScxWrappedException. 其余方法同样参考此说明
     default byte[] read(int maxLength) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException {
         var consumer = new LazyByteArrayByteConsumer();
         read(consumer, maxLength);
@@ -270,7 +270,7 @@ public interface ByteInput extends AutoCloseable {
         return peekUntil(new KMPByteIndexer(b), maxLength);
     }
 
-    /// ByteOutput 中的 异常 (ScxOutputException, OutputAlreadyClosedException) 因为其本质是 RuntimeException, 这里强转是安全的.
+    /// [ByteOutput] 中的 异常 ([ScxOutputException], [OutputAlreadyClosedException]) 因为其本质是 RuntimeException, 这里强转是安全的.
     default long transferTo(ByteOutput byteOutput, long maxLength) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException, ScxOutputException, OutputAlreadyClosedException {
         var consumer = new ByteOutputByteConsumer(byteOutput);
         try {
