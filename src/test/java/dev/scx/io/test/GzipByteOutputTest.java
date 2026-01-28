@@ -45,6 +45,7 @@ public class GzipByteOutputTest {
 
         gba.close();
 
+        // 测试 2者 结果是否相等
         Assert.assertEquals(bao.bytes(), ba.toByteArray());
     }
 
@@ -62,6 +63,7 @@ public class GzipByteOutputTest {
 
         gba.close();
 
+        // 测试 2者 结果是否相等
         Assert.assertEquals(bao.bytes(), ba.toByteArray());
     }
 
