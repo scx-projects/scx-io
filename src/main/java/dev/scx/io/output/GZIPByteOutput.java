@@ -113,11 +113,6 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     }
 
     @Override
-    public boolean isClosed() {
-        return closed;
-    }
-
-    @Override
     public void close() throws ScxOutputException, OutputAlreadyClosedException {
         ensureOpen();
 
