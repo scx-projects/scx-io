@@ -6,7 +6,7 @@ import dev.scx.io.exception.OutputAlreadyClosedException;
 import dev.scx.io.exception.ScxInputException;
 import dev.scx.io.exception.ScxOutputException;
 import dev.scx.io.output.ByteArrayByteOutput;
-import dev.scx.io.output.LengthBoundedOutput;
+import dev.scx.io.output.LengthBoundedByteOutput;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -45,7 +45,7 @@ public class TransferToTest {
     @Test
     public static void test3() {
         var input = ScxIO.createByteInput("123456789".getBytes());
-        var output = new LengthBoundedOutput(new ByteArrayByteOutput(), 3, 3);
+        var output = new LengthBoundedByteOutput(new ByteArrayByteOutput(), 3, 3);
         Assert.assertThrows(ScxOutputException.class, () -> input.transferToAll(output));
     }
 

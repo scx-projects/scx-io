@@ -2,7 +2,6 @@ package dev.scx.io.supplier;
 
 import dev.scx.io.ByteChunk;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
