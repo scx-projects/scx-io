@@ -1,21 +1,21 @@
 package dev.scx.io.output;
 
 import dev.scx.io.ByteChunk;
-import dev.scx.io.consumer.ByteArrayByteConsumer;
+import dev.scx.io.consumer.LazyByteArrayByteConsumer;
 import dev.scx.io.exception.OutputAlreadyClosedException;
 
-/// ByteArrayByteOutput
+/// LazyByteArrayByteOutput
 ///
-/// 这里直接借用 [ByteArrayByteConsumer] 来实现
+/// 这里直接借用 [LazyByteArrayByteConsumer] 来实现
 ///
 /// @author scx567888
 /// @version 0.0.1
-public final class ByteArrayByteOutput extends AbstractByteOutput {
+public final class LazyByteArrayByteOutput extends AbstractByteOutput {
 
-    private final ByteArrayByteConsumer byteConsumer;
+    private final LazyByteArrayByteConsumer byteConsumer;
 
-    public ByteArrayByteOutput() {
-        this.byteConsumer = new ByteArrayByteConsumer();
+    public LazyByteArrayByteOutput() {
+        this.byteConsumer = new LazyByteArrayByteConsumer();
     }
 
     @Override

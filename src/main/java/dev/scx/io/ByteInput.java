@@ -1,7 +1,7 @@
 package dev.scx.io;
 
 import dev.scx.exception.ScxWrappedException;
-import dev.scx.io.consumer.ByteArrayByteConsumer;
+import dev.scx.io.consumer.LazyByteArrayByteConsumer;
 import dev.scx.io.consumer.ByteConsumer;
 import dev.scx.io.consumer.ByteOutputByteConsumer;
 import dev.scx.io.consumer.SkipByteConsumer;
@@ -105,27 +105,27 @@ public interface ByteInput extends AutoCloseable {
     /// 若流关闭时发生异常, 将抛出 [ScxInputException]. 但此时不应该改变 isClosed 标识状态.
     void close() throws ScxInputException, InputAlreadyClosedException;
 
-    /// 内置的 ByteArrayByteConsumer 不会抛出任何异常, 所以 此处方法签名 省略 ScxWrappedException. 其余方法同样参考此说明
+    /// 内置的 LazyByteArrayByteConsumer 不会抛出任何异常, 所以 此处方法签名 省略 ScxWrappedException. 其余方法同样参考此说明
     default byte[] read(int maxLength) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException {
-        var consumer = new ByteArrayByteConsumer();
+        var consumer = new LazyByteArrayByteConsumer();
         read(consumer, maxLength);
         return consumer.bytes();
     }
 
     default byte[] readUpTo(int length) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException {
-        var consumer = new ByteArrayByteConsumer();
+        var consumer = new LazyByteArrayByteConsumer();
         readUpTo(consumer, length);
         return consumer.bytes();
     }
 
     default byte[] readFully(int length) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException {
-        var consumer = new ByteArrayByteConsumer();
+        var consumer = new LazyByteArrayByteConsumer();
         readFully(consumer, length);
         return consumer.bytes();
     }
 
     default byte[] readAll() throws ScxInputException, InputAlreadyClosedException {
-        var consumer = new ByteArrayByteConsumer();
+        var consumer = new LazyByteArrayByteConsumer();
         readAll(consumer);
         return consumer.bytes();
     }
@@ -139,25 +139,25 @@ public interface ByteInput extends AutoCloseable {
     }
 
     default byte[] peek(int maxLength) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException {
-        var consumer = new ByteArrayByteConsumer();
+        var consumer = new LazyByteArrayByteConsumer();
         peek(consumer, maxLength);
         return consumer.bytes();
     }
 
     default byte[] peekUpTo(int length) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException {
-        var consumer = new ByteArrayByteConsumer();
+        var consumer = new LazyByteArrayByteConsumer();
         peekUpTo(consumer, length);
         return consumer.bytes();
     }
 
     default byte[] peekFully(int length) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException {
-        var consumer = new ByteArrayByteConsumer();
+        var consumer = new LazyByteArrayByteConsumer();
         peekFully(consumer, length);
         return consumer.bytes();
     }
 
     default byte[] peekAll() throws ScxInputException, InputAlreadyClosedException {
-        var consumer = new ByteArrayByteConsumer();
+        var consumer = new LazyByteArrayByteConsumer();
         peekAll(consumer);
         return consumer.bytes();
     }
