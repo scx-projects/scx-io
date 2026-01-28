@@ -2,17 +2,17 @@ package dev.scx.io.consumer;
 
 import dev.scx.io.ByteChunk;
 
-/// ByteArrayByteConsumer
+/// LazyByteArrayByteConsumer
 ///
 /// @author scx567888
 /// @version 0.0.1
-public final class ByteArrayByteConsumer implements ByteConsumer {
+public final class LazyByteArrayByteConsumer implements ByteConsumer {
 
     private ByteChunkNode head;
     private ByteChunkNode tail;
     private int total;
 
-    public ByteArrayByteConsumer() {
+    public LazyByteArrayByteConsumer() {
         this.head = null;
         this.tail = null;
         this.total = 0;

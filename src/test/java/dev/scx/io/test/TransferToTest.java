@@ -5,7 +5,7 @@ import dev.scx.io.exception.InputAlreadyClosedException;
 import dev.scx.io.exception.OutputAlreadyClosedException;
 import dev.scx.io.exception.ScxInputException;
 import dev.scx.io.exception.ScxOutputException;
-import dev.scx.io.output.ByteArrayByteOutput;
+import dev.scx.io.output.LazyByteArrayByteOutput;
 import dev.scx.io.output.LengthBoundedByteOutput;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -28,7 +28,7 @@ public class TransferToTest {
             "o((>ω< ))o(╬▔皿▔)╯(～￣(OO)￣)ブ（︶^︶）".getBytes(),
             "     \r\n\t\n\r\t".getBytes()
         );
-        var output = new ByteArrayByteOutput();
+        var output = new LazyByteArrayByteOutput();
         input.transferToAll(output);
         var bytes = output.bytes();
         Assert.assertEquals(bytes.length, 126);
@@ -37,7 +37,7 @@ public class TransferToTest {
     @Test
     public static void test2() throws OutputAlreadyClosedException {
         var input = ScxIO.createByteInput("123456789".getBytes());
-        var output = new ByteArrayByteOutput();
+        var output = new LazyByteArrayByteOutput();
         output.close();
         Assert.assertThrows(OutputAlreadyClosedException.class, () -> input.transferToAll(output));
     }
@@ -45,7 +45,7 @@ public class TransferToTest {
     @Test
     public static void test3() {
         var input = ScxIO.createByteInput("123456789".getBytes());
-        var output = new LengthBoundedByteOutput(new ByteArrayByteOutput(), 3, 3);
+        var output = new LengthBoundedByteOutput(new LazyByteArrayByteOutput(), 3, 3);
         Assert.assertThrows(ScxOutputException.class, () -> input.transferToAll(output));
     }
 
