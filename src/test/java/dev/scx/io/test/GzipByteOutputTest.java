@@ -1,6 +1,5 @@
 package dev.scx.io.test;
 
-import dev.scx.io.ByteChunk;
 import dev.scx.io.ScxIO;
 import dev.scx.io.exception.OutputAlreadyClosedException;
 import dev.scx.io.exception.ScxOutputException;
