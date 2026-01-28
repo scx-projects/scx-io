@@ -1,6 +1,7 @@
 package dev.scx.io.supplier;
 
 import dev.scx.io.ByteChunk;
+import dev.scx.io.ByteInput;
 import dev.scx.io.exception.ScxInputException;
 
 import java.util.ArrayList;
@@ -18,6 +19,10 @@ public final class CacheByteSupplier implements ByteSupplier {
     private final List<ByteChunk> cache;
     private int chunkIndex;
     private boolean isFinish;
+
+    public CacheByteSupplier(ByteInput byteInput) {
+        this(new ByteInputByteSupplier(byteInput));
+    }
 
     public CacheByteSupplier(ByteSupplier byteSupplier) {
         this.byteSupplier = byteSupplier;
