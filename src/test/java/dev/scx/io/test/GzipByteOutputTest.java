@@ -4,11 +4,10 @@ import dev.scx.io.ByteChunk;
 import dev.scx.io.ScxIO;
 import dev.scx.io.exception.OutputAlreadyClosedException;
 import dev.scx.io.exception.ScxOutputException;
-import dev.scx.io.output.OutputStreamByteOutput;
+import dev.scx.io.output.EagerByteArrayByteOutput;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class GzipByteOutputTest {
@@ -19,14 +18,17 @@ public class GzipByteOutputTest {
 
     @Test
     public static void test1() throws IOException, OutputAlreadyClosedException, ScxOutputException {
-        var bao = new ByteArrayOutputStream();
-        var gzipByteOutput = new OutputStreamByteOutput(bao);
+        var bao = new EagerByteArrayByteOutput();
+        var byteOutput = ScxIO.gzipByteOutput(bao);
 
-        var byteOutput = ScxIO.gzipByteOutput(gzipByteOutput);
+        // 测试 空块写入
+        byteOutput.write(new byte[0]);
 
         byteOutput.write(ByteChunk.of("abcd".getBytes()));
+        // 测试 空块写入
+        byteOutput.write(new byte[0]);
 
-        Assert.assertEquals(bao.toByteArray(), new byte[]{31, -117, 8, 0, 0, 0, 0, 0, 0, -1});
+        Assert.assertEquals(bao.bytes(), new byte[]{31, -117, 8, 0, 0, 0, 0, 0, 0, -1});
 
     }
 
