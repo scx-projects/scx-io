@@ -8,6 +8,10 @@ import dev.scx.io.exception.ScxOutputException;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 
+/// GZIPByteOutput
+///
+/// @author scx567888
+/// @version 0.0.1
 public final class GZIPByteOutput extends AbstractByteOutput {
 
     private static final int GZIP_MAGIC = 0x8b1f;
