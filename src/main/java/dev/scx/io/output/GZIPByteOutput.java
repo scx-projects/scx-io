@@ -54,6 +54,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
         write(ByteChunk.of(new byte[]{b}));
     }
 
+    /// 逻辑参考 [java.util.zip.GZIPOutputStream#write(byte\[\], int, int)]
     @Override
     public void write(ByteChunk byteChunk) throws ScxOutputException, OutputAlreadyClosedException {
         ensureOpen();
@@ -81,6 +82,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
         crc.update(byteChunk.bytes, byteChunk.start, byteChunk.length);
     }
 
+    /// 逻辑参考 [java.util.zip.DeflaterOutputStream#flush()]
     @Override
     public void flush() throws ScxOutputException, OutputAlreadyClosedException {
         ensureOpen();
@@ -101,6 +103,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
         out.flush();
     }
 
+    /// 逻辑参考 [java.util.zip.DeflaterOutputStream#close()]
     @Override
     public void close() throws ScxOutputException, OutputAlreadyClosedException {
         ensureOpen();
