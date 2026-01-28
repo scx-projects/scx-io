@@ -44,6 +44,7 @@ public final class NoCloseByteOutput extends AbstractByteOutput {
 
         // 这里中断 close, 改为刷新
         this.byteOutput.flush();
+
         closed = true; // 只有成功关闭才算作 关闭
     }
 

@@ -53,10 +53,12 @@ public final class ByteChunk {
         return getBytes(0, this.length);
     }
 
+    /// 默认使用平台编码, 仅建议用于调试
     public String toString(int start, int end) {
         return new String(this.bytes, this.start + start, end - start);
     }
 
+    /// 默认使用平台编码, 仅建议用于调试
     @Override
     public String toString() {
         return toString(0, length);

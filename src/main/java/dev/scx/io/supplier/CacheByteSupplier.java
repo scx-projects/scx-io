@@ -2,9 +2,6 @@ package dev.scx.io.supplier;
 
 import dev.scx.io.ByteChunk;
 import dev.scx.io.ByteInput;
-import dev.scx.io.consumer.ByteChunkByteConsumer;
-import dev.scx.io.exception.InputAlreadyClosedException;
-import dev.scx.io.exception.NoMoreDataException;
 import dev.scx.io.exception.ScxInputException;
 
 import java.util.ArrayList;
@@ -12,21 +9,23 @@ import java.util.List;
 
 /// CacheByteSupplier
 ///
-/// 可以缓存 byteInput, 调用 reset 可以从头继续使用
+/// 可以缓存上游 byteSupplier, 调用 reset 可以从头回放 (完全回放)
 ///
 /// @author scx567888
 /// @version 0.0.1
 public final class CacheByteSupplier implements ByteSupplier {
 
-    private final ByteInput byteInput;
-    private final ByteChunkByteConsumer consumer;
+    private final ByteSupplier byteSupplier;
     private final List<ByteChunk> cache;
     private int chunkIndex;
     private boolean isFinish;
 
     public CacheByteSupplier(ByteInput byteInput) {
-        this.byteInput = byteInput;
-        this.consumer = new ByteChunkByteConsumer();
+        this(new ByteInputByteSupplier(byteInput));
+    }
+
+    public CacheByteSupplier(ByteSupplier byteSupplier) {
+        this.byteSupplier = byteSupplier;
         this.cache = new ArrayList<>();
         this.chunkIndex = 0;
         this.isFinish = false;
@@ -34,6 +33,7 @@ public final class CacheByteSupplier implements ByteSupplier {
 
     @Override
     public ByteChunk get() throws ScxInputException {
+
         // 1, 如果允许使用缓存, 优先使用缓存
         if (chunkIndex < cache.size()) {
             var chunk = cache.get(chunkIndex);
@@ -46,38 +46,28 @@ public final class CacheByteSupplier implements ByteSupplier {
             return null;
         }
 
-        try {
-            byteInput.read(consumer, Long.MAX_VALUE);
-            var chunk = consumer.byteChunk();
-            cache.add(chunk);
-            chunkIndex = chunkIndex + 1;
-            return chunk;
-        } catch (NoMoreDataException e) {
-            // 遇到 EOF
+        var chunk = byteSupplier.get();
+
+        // 3, 遇到 EOF
+        if (chunk == null) {
             isFinish = true;
             return null;
-        } catch (InputAlreadyClosedException e) {
-            // 降级为 ScxInputException 因为在 CacheByteSupplier 的视角来看 就是 输入异常.
-            throw new ScxInputException("byteInput already closed", e);
         }
+
+        // 4, 即使是空块 我们也 保存, 保证对上游的 0 干涉.
+        cache.add(chunk);
+        chunkIndex = chunkIndex + 1;
+        return chunk;
 
     }
 
     @Override
     public void close() throws ScxInputException {
-        try {
-            byteInput.close();
-        } catch (InputAlreadyClosedException _) {
-
-        }
+        byteSupplier.close();
     }
 
     public void reset() {
         chunkIndex = 0;
-    }
-
-    public ByteInput byteInput() {
-        return byteInput;
     }
 
 }

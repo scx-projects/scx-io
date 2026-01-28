@@ -82,7 +82,7 @@ public final class DefaultByteInput extends AbstractByteInput {
      * @param consumer     字节消费者
      * @param maxLength    希望读取的字节数
      * @param movePointer  是否移动指针
-     * @param maxPullCount 最大允许调用底层 ByteSupplier 的次数
+     * @param maxPullCount 最大允许调用底层 ByteSupplier 的次数 (只对 非空块计数)
      * @param throwOnEOF   当遇到 EOF (底层数据源结束), 导致实际读取字节数不足时 是否抛异常
      */
     private void read0(ByteConsumer consumer, long maxLength, boolean movePointer, long maxPullCount, boolean throwOnEOF) throws NoMoreDataException, ScxInputException, ScxWrappedException {

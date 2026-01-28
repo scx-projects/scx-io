@@ -9,6 +9,8 @@ import dev.scx.io.exception.ScxInputException;
 
 /// LimitLengthByteSupplier
 ///
+/// 本质上只是一个加了 读取长度限制的 [ByteInputByteSupplier].
+///
 /// @author scx567888
 /// @version 0.0.1
 public final class LimitLengthByteSupplier implements ByteSupplier {
@@ -31,7 +33,8 @@ public final class LimitLengthByteSupplier implements ByteSupplier {
         }
         try {
             // 这里我们直接引用 原始 byteInput 中的 ByteChunk, 避免了数组的多次拷贝
-            byteInput.read(consumer, remaining);// 我们只尝试拉取一次
+            byteInput.read(consumer, remaining); // ByteChunkByteConsumer 保证了只会尝试拉取一次
+            // 这里因为 read 必然会读取至少一个字节, 所以 byteChunk 永远是新的, 不会重复.
             var byteChunk = consumer.byteChunk();
             remaining -= byteChunk.length;
             return byteChunk;

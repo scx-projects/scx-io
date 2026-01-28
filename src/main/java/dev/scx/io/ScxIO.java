@@ -8,10 +8,7 @@ import dev.scx.io.exception.ScxInputException;
 import dev.scx.io.exception.ScxOutputException;
 import dev.scx.io.input.DefaultByteInput;
 import dev.scx.io.output.OutputStreamByteOutput;
-import dev.scx.io.supplier.ByteArrayByteSupplier;
-import dev.scx.io.supplier.ByteSupplier;
-import dev.scx.io.supplier.FileByteSupplier;
-import dev.scx.io.supplier.InputStreamByteSupplier;
+import dev.scx.io.supplier.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,6 +86,21 @@ public final class ScxIO {
             return byteOutputAdapter.byteOutput();
         }
         return new OutputStreamByteOutput(outputStream);
+    }
+
+    /// 隔离底层 close.
+    public static ByteSupplier noClose(ByteSupplier byteSupplier) {
+        return new NoCloseByteSupplier(byteSupplier);
+    }
+
+    /// close 时排空, 同时会穿透底层 close.
+    public static ByteSupplier drainOnClose(ByteSupplier byteSupplier) {
+        return new DrainOnCloseByteSupplier(byteSupplier);
+    }
+
+    /// close 时排空, 但是隔离底层 close.
+    public static ByteSupplier drainOnCloseNoClose(ByteSupplier byteSupplier) {
+        return new DrainOnCloseByteSupplier(new NoCloseByteSupplier(byteSupplier));
     }
 
 }

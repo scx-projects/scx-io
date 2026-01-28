@@ -9,18 +9,24 @@ import dev.scx.io.exception.ScxOutputException;
 ///
 /// @author scx567888
 /// @version 0.0.1
-public final class LengthBoundedOutput implements ByteOutput {
+public final class LengthBoundedByteOutput implements ByteOutput {
 
     private final ByteOutput byteOutput;
     private final long minLength;
     private final long maxLength;
     private long bytesWritten;
 
-    public LengthBoundedOutput(ByteOutput byteOutput, long minLength, long maxLength) {
+    public LengthBoundedByteOutput(ByteOutput byteOutput, long minLength, long maxLength) {
         this.byteOutput = byteOutput;
         this.minLength = minLength;
         this.maxLength = maxLength;
         this.bytesWritten = 0;
+    }
+
+    private void ensureOpen() {
+        if (byteOutput.isClosed()) {
+            throw new OutputAlreadyClosedException();
+        }
     }
 
     private void ensureMax(int length) throws ScxOutputException {
@@ -37,6 +43,7 @@ public final class LengthBoundedOutput implements ByteOutput {
 
     @Override
     public void write(byte b) throws ScxOutputException, OutputAlreadyClosedException {
+        ensureOpen();
         ensureMax(1);
         byteOutput.write(b);
         bytesWritten += 1;
@@ -44,6 +51,7 @@ public final class LengthBoundedOutput implements ByteOutput {
 
     @Override
     public void write(ByteChunk b) throws ScxOutputException, OutputAlreadyClosedException {
+        ensureOpen();
         ensureMax(b.length);
         byteOutput.write(b);
         bytesWritten += b.length;
@@ -61,6 +69,7 @@ public final class LengthBoundedOutput implements ByteOutput {
 
     @Override
     public void close() throws ScxOutputException, OutputAlreadyClosedException {
+        ensureOpen();
         ensureMin();
         byteOutput.close();
     }
