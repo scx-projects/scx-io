@@ -9,6 +9,8 @@ import dev.scx.io.exception.ScxInputException;
 
 /// LimitLengthByteSupplier
 ///
+/// 本质上只是一个加了 读取长度限制的 [ByteInputByteSupplier].
+///
 /// @author scx567888
 /// @version 0.0.1
 public final class LimitLengthByteSupplier implements ByteSupplier {
