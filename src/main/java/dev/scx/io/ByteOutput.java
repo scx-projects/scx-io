@@ -5,6 +5,11 @@ import dev.scx.io.exception.ScxOutputException;
 
 /// ByteOutput
 ///
+/// 若任意方法抛出 ScxOutputException, 表示输出过程中发生错误;
+/// 此时该 ByteOutput 实例可能已经写出部分数据, 其后续行为不再具有确定性.
+/// 调用者可尝试调用 close() 进行清理, 但无论 close() 是否成功,
+/// 均应视该实例为不可再用并予以丢弃.
+///
 /// - 注意 : ByteOutput 的 close() 为非幂等操作, 重复 close 将抛 [OutputAlreadyClosedException].
 ///
 /// @author scx567888
