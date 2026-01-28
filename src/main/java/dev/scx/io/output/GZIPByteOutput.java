@@ -5,45 +5,46 @@ import dev.scx.io.ByteOutput;
 import dev.scx.io.exception.OutputAlreadyClosedException;
 import dev.scx.io.exception.ScxOutputException;
 
-import java.io.IOException;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 
-public class GZIPByteOutput implements ByteOutput {
+public final class GZIPByteOutput implements ByteOutput {
 
-    static final int DEFAULT_BUF_SIZE = 512;
+    private static final int DEFAULT_BUF_SIZE = 512;
     private static final int SYNC_FLUSH_MIN_BUF_SIZE = 7;
     private static final int GZIP_MAGIC = 0x8b1f;
     private static final int TRAILER_SIZE = 8;
     private static final byte OS_UNKNOWN = (byte) 255;
-    private final boolean syncFlush;
-    protected ByteOutput out;
-    protected Deflater def;
-    protected byte[] buf;
-    protected CRC32 crc = new CRC32();
-    boolean usesDefaultDeflater = false;
-    private boolean closed = false;
 
-    public GZIPByteOutput(ByteOutput out, int size) throws IOException {
+    private final ByteOutput out;
+    private final Deflater def;
+    private final byte[] buf;
+    private final boolean syncFlush;
+    private final CRC32 crc;
+
+    private boolean closed;
+
+    public GZIPByteOutput(ByteOutput out) throws ScxOutputException, OutputAlreadyClosedException {
+        this(out, DEFAULT_BUF_SIZE, false);
+    }
+
+    public GZIPByteOutput(ByteOutput out, int size) throws ScxOutputException, OutputAlreadyClosedException {
         this(out, size, false);
     }
 
-    public GZIPByteOutput(ByteOutput out, int size, boolean syncFlush) throws IOException {
+    public GZIPByteOutput(ByteOutput out, boolean syncFlush) throws ScxOutputException, OutputAlreadyClosedException {
+        this(out, DEFAULT_BUF_SIZE, syncFlush);
+    }
+
+    public GZIPByteOutput(ByteOutput out, int size, boolean syncFlush) throws ScxOutputException, OutputAlreadyClosedException {
         this.out = out;
         this.def = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
         this.buf = new byte[size];
         this.syncFlush = syncFlush;
-        usesDefaultDeflater = true;
         writeHeader();
-        crc.reset();
-    }
-
-    public GZIPByteOutput(ByteOutput out) throws IOException {
-        this(out, DEFAULT_BUF_SIZE, false);
-    }
-
-    public GZIPByteOutput(ByteOutput out, boolean syncFlush) throws IOException {
-        this(out, DEFAULT_BUF_SIZE, syncFlush);
+        this.crc = new CRC32();
+        this.crc.reset();
+        this.closed = false;
     }
 
     @Override
@@ -51,24 +52,32 @@ public class GZIPByteOutput implements ByteOutput {
         write(ByteChunk.of(new byte[]{b}));
     }
 
-    public synchronized void write(ByteChunk byteChunk) throws ScxOutputException {
+    @Override
+    public void write(ByteChunk byteChunk) throws ScxOutputException, OutputAlreadyClosedException {
         var b = byteChunk.bytes;
         var off = byteChunk.start;
         var len = byteChunk.length;
+
         if (def.finished()) {
             throw new ScxOutputException("write beyond end of stream");
         }
+
         if ((off | len | (off + len) | (b.length - (off + len))) < 0) {
             throw new IndexOutOfBoundsException();
         } else if (len == 0) {
             return;
         }
+
         if (!def.finished()) {
             def.setInput(b, off, len);
             while (!def.needsInput()) {
-                deflate();
+                int alen = def.deflate(buf, 0, buf.length);
+                if (alen > 0) {
+                    out.write(ByteChunk.of(buf, 0, alen));
+                }
             }
         }
+
         // crc 校验
         crc.update(byteChunk.bytes, byteChunk.start, byteChunk.length);
     }
@@ -110,9 +119,7 @@ public class GZIPByteOutput implements ByteOutput {
                 finishException = ioe;
                 throw ioe;
             } finally {
-                if (usesDefaultDeflater) {
-                    def.end();
-                }
+                def.end();
                 if (finishException == null) {
                     out.close();
                 } else {
@@ -129,48 +136,43 @@ public class GZIPByteOutput implements ByteOutput {
         }
     }
 
-    protected void deflate() throws ScxOutputException {
-        int len = def.deflate(buf, 0, buf.length);
-        if (len > 0) {
-            out.write(ByteChunk.of(buf, 0, len));
+    public void finish() throws ScxOutputException, OutputAlreadyClosedException {
+        if (def.finished()) {
+            return;
         }
-    }
 
-    public void finish() throws ScxOutputException {
-        if (!def.finished()) {
-            try {
-                def.finish();
-                while (!def.finished()) {
-                    int len = def.deflate(buf, 0, buf.length);
-                    if (def.finished() && len <= buf.length - TRAILER_SIZE) {
-                        // last deflater buffer. Fit trailer at the end
-                        writeTrailer(buf, len);
-                        len = len + TRAILER_SIZE;
-                        out.write(ByteChunk.of(buf, 0, len));
-                        return;
-                    }
-                    if (len > 0) {
-                        out.write(ByteChunk.of(buf, 0, len));
-                    }
+        try {
+            def.finish();
+
+            while (!def.finished()) {
+                int len = def.deflate(buf, 0, buf.length);
+                if (def.finished() && len <= buf.length - TRAILER_SIZE) {
+                    // last deflater buffer. Fit trailer at the end
+                    writeTrailer(buf, len);
+                    len = len + TRAILER_SIZE;
+                    out.write(ByteChunk.of(buf, 0, len));
+                    return;
                 }
-                // if we can't fit the trailer at the end of the last
-                // deflater buffer, we write it separately
-                byte[] trailer = new byte[TRAILER_SIZE];
-                writeTrailer(trailer, 0);
-                out.write(trailer);
-            } catch (ScxOutputException e) {
-                if (usesDefaultDeflater) {
-                    def.end();
+                if (len > 0) {
+                    out.write(ByteChunk.of(buf, 0, len));
                 }
-                throw e;
             }
+
+            // if we can't fit the trailer at the end of the last
+            // deflater buffer, we write it separately
+            byte[] trailer = new byte[TRAILER_SIZE];
+            writeTrailer(trailer, 0);
+            out.write(trailer);
+        } catch (ScxOutputException | OutputAlreadyClosedException e) {
+            def.end();
+            throw e;
         }
     }
 
     /*
      * Writes GZIP member header.
      */
-    private void writeHeader() throws IOException {
+    private void writeHeader() throws ScxOutputException, OutputAlreadyClosedException {
         out.write(new byte[]{
             (byte) GZIP_MAGIC,        // Magic number (short)
             (byte) (GZIP_MAGIC >> 8),  // Magic number (short)
@@ -190,28 +192,18 @@ public class GZIPByteOutput implements ByteOutput {
      * offset.
      */
     private void writeTrailer(byte[] buf, int offset) {
-        writeInt((int) crc.getValue(), buf, offset); // CRC-32 of uncompr. data
+        // CRC-32 of uncompr. data
+        int crc32 = (int) crc.getValue();
+        buf[offset] = (byte) (crc32);
+        buf[offset + 1] = (byte) (crc32 >>> 8);
+        buf[offset + 2] = (byte) (crc32 >>> 16);
+        buf[offset + 3] = (byte) (crc32 >>> 24);
         // RFC 1952: Size of the original (uncompressed) input data modulo 2^32
         int iSize = (int) def.getBytesRead();
-        writeInt(iSize, buf, offset + 4);
-    }
-
-    /*
-     * Writes integer in Intel byte order to a byte array, starting at a
-     * given offset.
-     */
-    private void writeInt(int i, byte[] buf, int offset) {
-        writeShort(i & 0xffff, buf, offset);
-        writeShort((i >> 16) & 0xffff, buf, offset + 2);
-    }
-
-    /*
-     * Writes short integer in Intel byte order to a byte array, starting
-     * at a given offset
-     */
-    private void writeShort(int s, byte[] buf, int offset) {
-        buf[offset] = (byte) (s & 0xff);
-        buf[offset + 1] = (byte) ((s >> 8) & 0xff);
+        buf[offset + 4] = (byte) (iSize);
+        buf[offset + 5] = (byte) (iSize >>> 8);
+        buf[offset + 6] = (byte) (iSize >>> 16);
+        buf[offset + 7] = (byte) (iSize >>> 24);
     }
 
 }
