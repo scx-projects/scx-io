@@ -26,6 +26,9 @@ public final class BufferedInputStreamByteSupplier implements ByteSupplier {
     }
 
     public BufferedInputStreamByteSupplier(InputStream inputStream, int bufferLength) {
+        if (bufferLength <= 0) {
+            throw new IllegalArgumentException("bufferLength must be greater than 0");
+        }
         this.inputStream = inputStream;
         this.buffer = new byte[bufferLength];
     }
