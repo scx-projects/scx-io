@@ -1,9 +1,9 @@
 package dev.scx.io;
 
 import dev.scx.exception.ScxWrappedException;
-import dev.scx.io.consumer.LazyByteArrayByteConsumer;
 import dev.scx.io.consumer.ByteConsumer;
 import dev.scx.io.consumer.ByteOutputByteConsumer;
+import dev.scx.io.consumer.LazyByteArrayByteConsumer;
 import dev.scx.io.consumer.SkipByteConsumer;
 import dev.scx.io.exception.*;
 import dev.scx.io.indexer.ByteIndexer;
