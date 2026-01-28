@@ -9,14 +9,14 @@ import dev.scx.io.exception.ScxOutputException;
 ///
 /// @author scx567888
 /// @version 0.0.1
-public final class LengthBoundedOutput implements ByteOutput {
+public final class LengthBoundedByteOutput implements ByteOutput {
 
     private final ByteOutput byteOutput;
     private final long minLength;
     private final long maxLength;
     private long bytesWritten;
 
-    public LengthBoundedOutput(ByteOutput byteOutput, long minLength, long maxLength) {
+    public LengthBoundedByteOutput(ByteOutput byteOutput, long minLength, long maxLength) {
         this.byteOutput = byteOutput;
         this.minLength = minLength;
         this.maxLength = maxLength;
