@@ -10,10 +10,7 @@ import java.util.zip.Deflater;
 
 public final class GZIPByteOutput extends AbstractByteOutput {
 
-    private static final int DEFAULT_BUFFER_LENGTH = 1024;
-    private static final int SYNC_FLUSH_MIN_BUF_SIZE = 7;
     private static final int GZIP_MAGIC = 0x8b1f;
-    private static final byte OS_UNKNOWN = (byte) 255;
 
     private final ByteOutput out;
     private final Deflater def;
@@ -24,7 +21,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     private boolean headerWritten;
 
     public GZIPByteOutput(ByteOutput out) throws ScxOutputException, OutputAlreadyClosedException {
-        this(out, DEFAULT_BUFFER_LENGTH, false);
+        this(out, 1024, false);
     }
 
     public GZIPByteOutput(ByteOutput out, int bufferLength) throws ScxOutputException, OutputAlreadyClosedException {
@@ -32,7 +29,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     }
 
     public GZIPByteOutput(ByteOutput out, boolean syncFlush) throws ScxOutputException, OutputAlreadyClosedException {
-        this(out, DEFAULT_BUFFER_LENGTH, syncFlush);
+        this(out, 1024, syncFlush);
     }
 
     public GZIPByteOutput(ByteOutput out, int bufferLength, boolean syncFlush) throws ScxOutputException, OutputAlreadyClosedException {
@@ -144,7 +141,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     }
 
     /// Writes GZIP member header.
-    public void ensureHeader() throws ScxOutputException, OutputAlreadyClosedException {
+    private void ensureHeader() throws ScxOutputException, OutputAlreadyClosedException {
         if (headerWritten) {
             return;
         }
@@ -154,16 +151,16 @@ public final class GZIPByteOutput extends AbstractByteOutput {
 
     private byte[] createHeader() {
         return new byte[]{
-            (byte) GZIP_MAGIC,        // Magic number (short)
+            (byte) GZIP_MAGIC,         // Magic number (short)
             (byte) (GZIP_MAGIC >> 8),  // Magic number (short)
-            Deflater.DEFLATED,        // Compression method (CM)
-            0,                        // Flags (FLG)
-            0,                        // Modification time MTIME (int)
-            0,                        // Modification time MTIME (int)
-            0,                        // Modification time MTIME (int)
-            0,                        // Modification time MTIME (int)
-            0,                        // Extra flags (XFLG)
-            OS_UNKNOWN                // Operating system (OS)
+            Deflater.DEFLATED,         // Compression method (CM)
+            0,                         // Flags (FLG)
+            0,                         // Modification time MTIME (int)
+            0,                         // Modification time MTIME (int)
+            0,                         // Modification time MTIME (int)
+            0,                         // Modification time MTIME (int)
+            0,                         // Extra flags (XFLG)
+            (byte) 255                 // Operating system (OS) "OS_UNKNOWN"
         };
     }
 
