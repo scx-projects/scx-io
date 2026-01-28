@@ -8,12 +8,15 @@ import dev.scx.io.output.EagerByteArrayByteOutput;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.zip.GZIPOutputStream;
 
 public class GzipByteOutputTest {
 
     public static void main(String[] args) throws IOException, OutputAlreadyClosedException, ScxOutputException {
         test1();
+        test2();
     }
 
     @Test
@@ -28,8 +31,38 @@ public class GzipByteOutputTest {
         // 测试 空块写入
         byteOutput.write(new byte[0]);
 
-        Assert.assertEquals(bao.bytes(), new byte[]{31, -117, 8, 0, 0, 0, 0, 0, 0, -1});
+        byteOutput.close();
 
+        // jdk 的写入方式
+        var ba = new ByteArrayOutputStream();
+        var gba = new GZIPOutputStream(ba);
+        // 测试 空块写入
+        gba.write(new byte[0]);
+
+        gba.write("abcd".getBytes());
+        // 测试 空块写入
+        gba.write(new byte[0]);
+
+        gba.close();
+
+        Assert.assertEquals(bao.bytes(), ba.toByteArray());
+    }
+
+    // 测试空流
+    @Test
+    public static void test2() throws IOException, OutputAlreadyClosedException, ScxOutputException {
+        var bao = new EagerByteArrayByteOutput();
+        var byteOutput = ScxIO.gzipByteOutput(bao);
+
+        byteOutput.close();
+
+        // jdk 的写入方式
+        var ba = new ByteArrayOutputStream();
+        var gba = new GZIPOutputStream(ba);
+
+        gba.close();
+
+        Assert.assertEquals(bao.bytes(), ba.toByteArray());
     }
 
 }
