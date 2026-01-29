@@ -10,10 +10,10 @@ import dev.scx.io.supplier.ByteArrayByteSupplier;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.zip.GZIPOutputStream;
+
+import static dev.scx.io.ScxIO.gzip;
 
 public class GzipByteInputTest {
 
@@ -21,27 +21,19 @@ public class GzipByteInputTest {
         test1();
     }
 
-    private static byte[] toGzipBytes(byte[] b) throws IOException {
-        var bao = new ByteArrayOutputStream();
-        var gzip = new GZIPOutputStream(bao);
-        gzip.write(b);
-        gzip.close();
-        return bao.toByteArray();
-    }
-
     @Test
     public static void test1() throws IOException, InputAlreadyClosedException, NoMatchFoundException, ScxInputException {
         var rawStr = "1234567890😀🥀👨‍🦰🌵中文!@$%^&*()()";
         var rawData = rawStr.getBytes();
 
-        var gzipData = toGzipBytes(rawData);
+        var gzipData = gzip(rawData);
 
         var s = new ArrayList<byte[]>();
         for (int i = 0; i < 100; i = i + 1) {
             s.add(gzipData);
         }
 
-        s.add(toGzipBytes("\r\n".getBytes()));
+        s.add(gzip("\r\n".getBytes()));
 
         var gzipByteInput = new DefaultByteInput(new ByteArrayByteSupplier(s));
 

@@ -5,15 +5,14 @@ import dev.scx.io.adapter.ByteInputInputStream;
 import dev.scx.io.adapter.ByteOutputAdapter;
 import dev.scx.io.adapter.ByteOutputOutputStream;
 import dev.scx.io.exception.ScxInputException;
+import dev.scx.io.exception.ScxOutputException;
 import dev.scx.io.input.DefaultByteInput;
+import dev.scx.io.output.EagerByteArrayByteOutput;
 import dev.scx.io.output.GZIPByteOutput;
 import dev.scx.io.output.OutputStreamByteOutput;
 import dev.scx.io.supplier.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.zip.GZIPInputStream;
 
 import static dev.scx.io.output.GZIPByteOutput.GZIPByteOutputOptions;
@@ -102,6 +101,26 @@ public final class ScxIO {
     /// close 时排空, 但是隔离底层 close.
     public static ByteSupplier drainOnCloseNoClose(ByteSupplier byteSupplier) {
         return new DrainOnCloseByteSupplier(new NoCloseByteSupplier(byteSupplier));
+    }
+
+    /// gzip 压缩 整个 byte[].
+    /// 注意仅适用于小数据, 大数据请用 [GZIPByteOutput].
+    public static byte[] gzip(byte[] data) throws ScxOutputException {
+        var byteArrayByteOutput = new EagerByteArrayByteOutput();
+        try (var gzipByteOutput = new GZIPByteOutput(byteArrayByteOutput)) {
+            gzipByteOutput.write(data);
+        }
+        return byteArrayByteOutput.bytes();
+    }
+
+    /// gzip 解压 整个 byte[].
+    /// 注意仅适用于小数据, 大数据请用 [GZIPInputStream].
+    public static byte[] ungzip(byte[] data) throws ScxInputException {
+        try (var gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(data))) {
+            return gzipInputStream.readAllBytes();
+        } catch (IOException e) {
+            throw new ScxInputException(e);
+        }
     }
 
 }
