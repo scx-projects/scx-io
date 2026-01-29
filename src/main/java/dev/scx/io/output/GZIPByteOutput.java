@@ -29,9 +29,6 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     }
 
     public GZIPByteOutput(ByteOutput out, GZIPByteOutputOptions options) {
-        if (options.bufferLength <= 0) {
-            throw new IllegalArgumentException("bufferLength must be greater than 0");
-        }
         this.out = out;
         this.def = new Deflater(options.compressionLevel, true);
         this.buffer = new byte[options.bufferLength];
@@ -174,7 +171,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     }
 
     /// 因配置项过多, 此处拆成独立的 Options 类.
-    public static class GZIPByteOutputOptions {
+    public static final class GZIPByteOutputOptions {
 
         private int bufferLength;
         private boolean syncFlush;
@@ -191,6 +188,9 @@ public final class GZIPByteOutput extends AbstractByteOutput {
         }
 
         public GZIPByteOutputOptions bufferLength(int bufferLength) {
+            if (bufferLength <= 0) {
+                throw new IllegalArgumentException("bufferLength must be greater than 0");
+            }
             this.bufferLength = bufferLength;
             return this;
         }
@@ -209,6 +209,9 @@ public final class GZIPByteOutput extends AbstractByteOutput {
         }
 
         public GZIPByteOutputOptions compressionLevel(int compressionLevel) {
+            if (compressionLevel != Deflater.DEFAULT_COMPRESSION && (compressionLevel < 0 || compressionLevel > 9)) {
+                throw new IllegalArgumentException("compressionLevel must be -1 or 0..9");
+            }
             this.compressionLevel = compressionLevel;
             return this;
         }
