@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 
+import static dev.scx.io.output.GZIPByteOutput.GZIPByteOutputOptions;
+
 /// ScxIO
 ///
 /// @author scx567888
@@ -56,6 +58,10 @@ public final class ScxIO {
 
     public static ByteOutput gzipByteOutput(ByteOutput byteOutput) {
         return new GZIPByteOutput(byteOutput);
+    }
+
+    public static ByteOutput gzipByteOutput(ByteOutput byteOutput, GZIPByteOutputOptions options) {
+        return new GZIPByteOutput(byteOutput, options);
     }
 
     public static InputStream byteInputToInputStream(ByteInput byteInput) {

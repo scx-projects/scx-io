@@ -25,25 +25,17 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     private boolean headerWritten;
 
     public GZIPByteOutput(ByteOutput out) {
-        this(out, 1024, false);
+        this(out, new GZIPByteOutputOptions());
     }
 
-    public GZIPByteOutput(ByteOutput out, int bufferLength) {
-        this(out, bufferLength, false);
-    }
-
-    public GZIPByteOutput(ByteOutput out, boolean syncFlush) {
-        this(out, 1024, syncFlush);
-    }
-
-    public GZIPByteOutput(ByteOutput out, int bufferLength, boolean syncFlush) {
-        if (bufferLength <= 0) {
+    public GZIPByteOutput(ByteOutput out, GZIPByteOutputOptions options) {
+        if (options.bufferLength <= 0) {
             throw new IllegalArgumentException("bufferLength must be greater than 0");
         }
         this.out = out;
-        this.def = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-        this.buffer = new byte[bufferLength];
-        this.syncFlush = syncFlush;
+        this.def = new Deflater(options.compressionLevel, true);
+        this.buffer = new byte[options.bufferLength];
+        this.syncFlush = options.syncFlush;
         this.crc = new CRC32();
         this.headerWritten = false;
         this.closed = false;
@@ -179,6 +171,48 @@ public final class GZIPByteOutput extends AbstractByteOutput {
             (byte) (iSize >>> 16),
             (byte) (iSize >>> 24),
         };
+    }
+
+    /// 因配置项过多, 此处拆成独立的 Options 类.
+    public static class GZIPByteOutputOptions {
+
+        private int bufferLength;
+        private boolean syncFlush;
+        private int compressionLevel;
+
+        public GZIPByteOutputOptions() {
+            this.bufferLength = 1024;
+            this.syncFlush = false;
+            this.compressionLevel = Deflater.DEFAULT_COMPRESSION;
+        }
+
+        public int bufferLength() {
+            return bufferLength;
+        }
+
+        public GZIPByteOutputOptions bufferLength(int bufferLength) {
+            this.bufferLength = bufferLength;
+            return this;
+        }
+
+        public boolean syncFlush() {
+            return syncFlush;
+        }
+
+        public GZIPByteOutputOptions syncFlush(boolean syncFlush) {
+            this.syncFlush = syncFlush;
+            return this;
+        }
+
+        public int compressionLevel() {
+            return compressionLevel;
+        }
+
+        public GZIPByteOutputOptions compressionLevel(int compressionLevel) {
+            this.compressionLevel = compressionLevel;
+            return this;
+        }
+
     }
 
 }
