@@ -11,11 +11,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
+import static dev.scx.io.ScxIO.gzip;
+
 public class GzipByteOutputTest {
 
     public static void main(String[] args) throws IOException, OutputAlreadyClosedException, ScxOutputException {
         test1();
         test2();
+        test3();
     }
 
     @Test
@@ -69,6 +72,13 @@ public class GzipByteOutputTest {
 
         // 测试 2者 结果是否相等
         Assert.assertEquals(bao.bytes(), ba.toByteArray());
+    }
+
+    @Test
+    public static void test3() {
+        var data = "abcdef👩.123133👱‍♂️🎎🖼🎞🎾🏓🥌⛸".repeat(300).getBytes();
+        byte[] gzip = gzip(data);
+        Assert.assertEquals(gzip.length, 153);
     }
 
 }
