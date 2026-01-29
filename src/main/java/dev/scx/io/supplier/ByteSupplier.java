@@ -18,6 +18,7 @@ public interface ByteSupplier extends AutoCloseable {
 
     /// 获取下一个数据块
     ///
+    /// - 返回的 ByteChunk 所覆盖的字节内容(区间)在后续不得被修改或覆写.
     /// - 必须是推进式的阻塞拉取
     /// - 如果当前已经读取到有效数据 -> 返回 ByteChunk(len > 0)
     /// - 如果暂时无法输出数据, 但 I/O 状态确实推进了 -> 返回 [ByteChunk#EMPTY_BYTE_CHUNK]

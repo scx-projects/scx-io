@@ -72,7 +72,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
         while (!def.needsInput()) {
             int len = def.deflate(buffer, 0, buffer.length, Deflater.NO_FLUSH);
             if (len > 0) {
-                out.write(ByteChunk.of(buffer, 0, len));
+                writeBuffer(len);
             }
         }
 
@@ -91,7 +91,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
             while (true) {
                 var len = def.deflate(buffer, 0, buffer.length, Deflater.SYNC_FLUSH);
                 if (len > 0) {
-                    out.write(ByteChunk.of(buffer, 0, len));
+                    writeBuffer(len);
                 } else {
                     break;
                 }
@@ -115,7 +115,7 @@ public final class GZIPByteOutput extends AbstractByteOutput {
             while (!def.finished()) {
                 int len = def.deflate(buffer, 0, buffer.length, Deflater.NO_FLUSH);
                 if (len > 0) {
-                    out.write(ByteChunk.of(buffer, 0, len));
+                    writeBuffer(len);
                 }
             }
 
@@ -126,6 +126,13 @@ public final class GZIPByteOutput extends AbstractByteOutput {
 
         closed = true;
 
+    }
+
+    /// 写入缓冲区
+    private void writeBuffer(int len) {
+        // 注意: 写出的 ByteChunk 视图复用同一 backing byte[] (buffer);
+        // 后续写入会覆盖该缓冲区内容, 下游必须在 write 返回前立即消费, 不得保存引用.
+        out.write(ByteChunk.of(buffer, 0, len));
     }
 
     /// Writes GZIP member header.

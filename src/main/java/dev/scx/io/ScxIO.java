@@ -106,6 +106,8 @@ public final class ScxIO {
     /// gzip 压缩 整个 byte[].
     /// 注意仅适用于小数据, 大数据请用 [GZIPByteOutput].
     public static byte[] gzip(byte[] data) throws ScxOutputException {
+        // 此处不能使用 LazyByteArrayByteOutput, 因为 LazyByteArrayByteOutput 持有的是 ByteChunk 引用.
+        // 而这个引用的 backing byte[], 在 GZIPByteOutput 中是可能被覆写的.
         var byteArrayByteOutput = new EagerByteArrayByteOutput();
         try (var gzipByteOutput = new GZIPByteOutput(byteArrayByteOutput)) {
             gzipByteOutput.write(data);
