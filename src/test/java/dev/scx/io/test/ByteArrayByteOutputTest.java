@@ -118,7 +118,7 @@ public class ByteArrayByteOutputTest {
             var s = new EagerByteArrayByteOutput();
 
             for (int i = 0; i < 500000; i++) {
-                s.write((byte)88);
+                s.write((byte) 88);
             }
             byte[] bytes = s.bytes();
 
@@ -128,7 +128,7 @@ public class ByteArrayByteOutputTest {
             var s1 = new LazyByteArrayByteOutput();
 
             for (int i = 0; i < 500000; i++) {
-                s1.write((byte)88);
+                s1.write((byte) 88);
             }
 
             byte[] bytes1 = s1.bytes();
