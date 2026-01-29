@@ -51,6 +51,10 @@ public final class GZIPByteOutput extends AbstractByteOutput {
 
     @Override
     public void write(byte b) throws ScxOutputException, OutputAlreadyClosedException {
+
+        // 注意: 此处直接 new.
+        // 不要尝试复用单字节 ByteChunk; 在现代 JVM 上短生命周期对象通常可被优化消除,
+        // 复用共享可变实例反而会限制 JIT 优化, 可能更慢.
         write(ByteChunk.of(new byte[]{b}));
     }
 
