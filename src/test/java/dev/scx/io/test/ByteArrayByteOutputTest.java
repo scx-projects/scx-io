@@ -13,7 +13,7 @@ public class ByteArrayByteOutputTest {
         test4();
     }
 
-    /// 此测试 不保证准确性 只是粗略测算
+    /// 此测试不保证准确性, 仅用于粗略观察不同写入模式下的性能趋势, 不应作为最终性能结论.
     /// 这种情况下 大概率 Lazy 更快.
     @Test
     public static void test1() {
@@ -46,7 +46,7 @@ public class ByteArrayByteOutputTest {
 
     }
 
-    /// 此测试 不保证准确性 只是粗略测算
+    /// 此测试不保证准确性, 仅用于粗略观察不同写入模式下的性能趋势, 不应作为最终性能结论.
     /// 这种情况下 不一定谁快, 但是 Lazy 会占用更多的内存(可能多很多), 而且 (性能/内存) 波动会很大 因为内部持有大量的 ByteChunkNode.
     @Test
     public static void test2() {
@@ -78,7 +78,7 @@ public class ByteArrayByteOutputTest {
         }
     }
 
-    /// 此测试 不保证准确性 只是粗略测算
+    /// 此测试不保证准确性, 仅用于粗略观察不同写入模式下的性能趋势, 不应作为最终性能结论.
     /// 这种情况 Lazy 几乎零成本.
     @Test
     public static void test3() {
@@ -108,7 +108,7 @@ public class ByteArrayByteOutputTest {
         }
     }
 
-    /// 此测试 不保证准确性 只是粗略测算
+    /// 此测试不保证准确性, 仅用于粗略观察不同写入模式下的性能趋势, 不应作为最终性能结论.
     /// 这种情况下 Eager 应该会更快, 原因一样是因为 Lazy 中的 ByteChunkNode 会有很大的内存占用和性能损耗.
     @Test
     public static void test4() {
