@@ -6,6 +6,12 @@ import java.util.Arrays;
 
 /// EagerByteArrayByteConsumer
 ///
+/// eager 模式: 每次 accept 都立即将数据拷贝到内部连续 byte[] (类似 ByteArrayOutputStream).
+/// 适合: 小块数据 + 高频 accept, 或需要频繁获取最终 bytes()/chunk() 的场景.
+/// 代价: 随着数据增长可能发生扩容与数组复制; 在大块数据快速增长时, 复制成本可能显著提高, 可能慢于 [LazyByteArrayByteConsumer].
+///
+/// 说明: 具体性能取决于 chunk 大小与 accept 次数; 本说明仅描述适用场景与代价.
+///
 /// 逻辑参考 [java.io.ByteArrayOutputStream].
 ///
 /// @author scx567888
