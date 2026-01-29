@@ -10,6 +10,11 @@ import java.util.zip.Deflater;
 
 /// GZIPByteOutput
 ///
+/// 注意: 本实现向下游写出的 ByteChunk 均基于同一个内部输出缓冲区(backing byte[]),
+/// 每次写出后该缓冲区内容可能被后续写入覆盖.
+/// 下游实现若延迟读取或保存 ByteChunk 引用(而非立即拷贝数据),
+/// 将导致结果不正确.
+///
 /// @author scx567888
 /// @version 0.0.1
 public final class GZIPByteOutput extends AbstractByteOutput {
@@ -25,25 +30,14 @@ public final class GZIPByteOutput extends AbstractByteOutput {
     private boolean headerWritten;
 
     public GZIPByteOutput(ByteOutput out) {
-        this(out, 1024, false);
+        this(out, new GZIPByteOutputOptions());
     }
 
-    public GZIPByteOutput(ByteOutput out, int bufferLength) {
-        this(out, bufferLength, false);
-    }
-
-    public GZIPByteOutput(ByteOutput out, boolean syncFlush) {
-        this(out, 1024, syncFlush);
-    }
-
-    public GZIPByteOutput(ByteOutput out, int bufferLength, boolean syncFlush) {
-        if (bufferLength <= 0) {
-            throw new IllegalArgumentException("bufferLength must be greater than 0");
-        }
+    public GZIPByteOutput(ByteOutput out, GZIPByteOutputOptions options) {
         this.out = out;
-        this.def = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-        this.buffer = new byte[bufferLength];
-        this.syncFlush = syncFlush;
+        this.def = new Deflater(options.compressionLevel, true);
+        this.buffer = new byte[options.bufferLength];
+        this.syncFlush = options.syncFlush;
         this.crc = new CRC32();
         this.headerWritten = false;
         this.closed = false;
@@ -179,6 +173,54 @@ public final class GZIPByteOutput extends AbstractByteOutput {
             (byte) (iSize >>> 16),
             (byte) (iSize >>> 24),
         };
+    }
+
+    /// 因配置项过多, 此处拆成独立的 Options 类.
+    public static final class GZIPByteOutputOptions {
+
+        private int bufferLength;
+        private boolean syncFlush;
+        private int compressionLevel;
+
+        public GZIPByteOutputOptions() {
+            this.bufferLength = 1024;
+            this.syncFlush = false;
+            this.compressionLevel = Deflater.DEFAULT_COMPRESSION;
+        }
+
+        public int bufferLength() {
+            return bufferLength;
+        }
+
+        public GZIPByteOutputOptions bufferLength(int bufferLength) {
+            if (bufferLength <= 0) {
+                throw new IllegalArgumentException("bufferLength must be greater than 0");
+            }
+            this.bufferLength = bufferLength;
+            return this;
+        }
+
+        public boolean syncFlush() {
+            return syncFlush;
+        }
+
+        public GZIPByteOutputOptions syncFlush(boolean syncFlush) {
+            this.syncFlush = syncFlush;
+            return this;
+        }
+
+        public int compressionLevel() {
+            return compressionLevel;
+        }
+
+        public GZIPByteOutputOptions compressionLevel(int compressionLevel) {
+            if (compressionLevel != Deflater.DEFAULT_COMPRESSION && (compressionLevel < 0 || compressionLevel > 9)) {
+                throw new IllegalArgumentException("compressionLevel must be -1 or 0..9");
+            }
+            this.compressionLevel = compressionLevel;
+            return this;
+        }
+
     }
 
 }

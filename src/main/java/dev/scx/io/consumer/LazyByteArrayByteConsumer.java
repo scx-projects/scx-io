@@ -8,7 +8,8 @@ import dev.scx.io.ByteChunk;
 /// 适合: accept 次数较少但单次 chunk 较大, 或仅在最后调用一次 bytes() 的场景.
 /// 代价: chunk 很小且 accept 次数很高时, 节点分配与遍历开销会主导, 可能明显慢于 [EagerByteArrayByteConsumer], 且内存波动更大.
 ///
-/// 注意: 本实现会持有 ByteChunk 的 backing byte[] 引用; 调用方需保证其在 bytes() 前保持有效且不被修改.
+/// 注意: 本实现会直接保存 ByteChunk 的 backing byte[] 引用而不拷贝数据;
+/// 调用方需保证该数组在 bytes() 前保持有效, 且不会被上游复用或覆盖.
 ///
 /// @author scx567888
 /// @version 0.0.1
