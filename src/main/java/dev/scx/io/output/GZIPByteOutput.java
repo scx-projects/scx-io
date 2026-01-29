@@ -10,6 +10,11 @@ import java.util.zip.Deflater;
 
 /// GZIPByteOutput
 ///
+/// 注意: 本实现向下游写出的 ByteChunk 均基于同一个内部输出缓冲区(backing byte[]),
+/// 每次写出后该缓冲区内容可能被后续写入覆盖.
+/// 下游实现若延迟读取或保存 ByteChunk 引用(而非立即拷贝数据),
+/// 将导致结果不正确.
+///
 /// @author scx567888
 /// @version 0.0.1
 public final class GZIPByteOutput extends AbstractByteOutput {
