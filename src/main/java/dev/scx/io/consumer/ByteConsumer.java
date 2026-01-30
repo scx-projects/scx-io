@@ -9,7 +9,7 @@ import dev.scx.io.ByteChunk;
 /// 语义说明:
 ///
 /// 1. ByteConsumer 仅用于 ByteInput 读取链路,
-///    它不是 ByteOutput，也不代表 "写入目的地".
+///    它不是 ByteOutput, 也不代表 "写入目的地".
 ///
 /// 2. 实现方 **允许** 在 accept 返回后继续使用或保存传入的 ByteChunk
 ///    (例如延迟处理, 聚合, 索引, 缓存等).
