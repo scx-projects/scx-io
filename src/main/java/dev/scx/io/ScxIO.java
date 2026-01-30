@@ -1,11 +1,12 @@
 package dev.scx.io;
 
+import dev.scx.exception.ScxWrappedException;
 import dev.scx.io.adapter.ByteInputAdapter;
 import dev.scx.io.adapter.ByteInputInputStream;
 import dev.scx.io.adapter.ByteOutputAdapter;
 import dev.scx.io.adapter.ByteOutputOutputStream;
-import dev.scx.io.exception.ScxInputException;
-import dev.scx.io.exception.ScxOutputException;
+import dev.scx.io.consumer.ByteOutputByteConsumer;
+import dev.scx.io.exception.*;
 import dev.scx.io.input.DefaultByteInput;
 import dev.scx.io.output.EagerByteArrayByteOutput;
 import dev.scx.io.output.GZIPByteOutput;
@@ -123,6 +124,51 @@ public final class ScxIO {
         } catch (IOException e) {
             throw new ScxInputException(e);
         }
+    }
+
+    /// [ByteOutput] 中的 异常 ([ScxOutputException], [OutputAlreadyClosedException]) 因为其本质是 RuntimeException, 这里强转是安全的.
+    public static long transferTo(ByteInput byteInput, ByteOutput byteOutput, long maxLength) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException, ScxOutputException, OutputAlreadyClosedException {
+        var consumer = new ByteOutputByteConsumer(byteOutput);
+        try {
+            byteInput.read(consumer, maxLength);
+        } catch (ScxWrappedException e) {
+            // 这里强转是安全的.
+            throw (RuntimeException) e.getCause();
+        }
+        return consumer.bytesWritten();
+    }
+
+    public static long transferToUpTo(ByteInput byteInput, ByteOutput byteOutput, long length) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException, ScxOutputException, OutputAlreadyClosedException {
+        var consumer = new ByteOutputByteConsumer(byteOutput);
+        try {
+            byteInput.readUpTo(consumer, length);
+        } catch (ScxWrappedException e) {
+            // 这里强转是安全的.
+            throw (RuntimeException) e.getCause();
+        }
+        return consumer.bytesWritten();
+    }
+
+    public static long transferToFully(ByteInput byteInput, ByteOutput byteOutput, long length) throws NoMoreDataException, ScxInputException, InputAlreadyClosedException, ScxOutputException, OutputAlreadyClosedException {
+        var consumer = new ByteOutputByteConsumer(byteOutput);
+        try {
+            byteInput.readFully(consumer, length);
+        } catch (ScxWrappedException e) {
+            // 这里强转是安全的.
+            throw (RuntimeException) e.getCause();
+        }
+        return consumer.bytesWritten();
+    }
+
+    public static long transferToAll(ByteInput byteInput, ByteOutput byteOutput) throws ScxInputException, InputAlreadyClosedException, ScxOutputException, OutputAlreadyClosedException {
+        var consumer = new ByteOutputByteConsumer(byteOutput);
+        try {
+            byteInput.readAll(consumer);
+        } catch (ScxWrappedException e) {
+            // 这里强转是安全的.
+            throw (RuntimeException) e.getCause();
+        }
+        return consumer.bytesWritten();
     }
 
 }
