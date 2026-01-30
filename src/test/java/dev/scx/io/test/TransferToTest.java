@@ -29,7 +29,7 @@ public class TransferToTest {
             "     \r\n\t\n\r\t".getBytes()
         );
         var output = new LazyByteArrayByteOutput();
-        input.transferToAll(output);
+        ScxIO.transferToAll(input, output);
         var bytes = output.bytes();
         Assert.assertEquals(bytes.length, 126);
     }
@@ -39,14 +39,14 @@ public class TransferToTest {
         var input = ScxIO.createByteInput("123456789".getBytes());
         var output = new LazyByteArrayByteOutput();
         output.close();
-        Assert.assertThrows(OutputAlreadyClosedException.class, () -> input.transferToAll(output));
+        Assert.assertThrows(OutputAlreadyClosedException.class, () -> ScxIO.transferToAll(input, output));
     }
 
     @Test
     public static void test3() {
         var input = ScxIO.createByteInput("123456789".getBytes());
         var output = new LengthBoundedByteOutput(new LazyByteArrayByteOutput(), 3, 3);
-        Assert.assertThrows(ScxOutputException.class, () -> input.transferToAll(output));
+        Assert.assertThrows(ScxOutputException.class, () -> ScxIO.transferToAll(input, output));
     }
 
 }
