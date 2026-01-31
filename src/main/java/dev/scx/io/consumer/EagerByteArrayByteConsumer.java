@@ -57,12 +57,8 @@ public final class EagerByteArrayByteConsumer implements ByteConsumer {
         return true;
     }
 
-    public ByteChunk chunk() {
-        return ByteChunk.of(bytes, 0, total);
-    }
-
     public byte[] bytes() {
-        return chunk().getBytes();
+        return Arrays.copyOf(bytes, total);
     }
 
     public int size() {
