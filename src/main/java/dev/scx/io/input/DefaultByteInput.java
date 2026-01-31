@@ -351,9 +351,10 @@ public final class DefaultByteInput extends AbstractByteInput {
             position = 0;
         }
 
+        /// 默认使用平台编码, 仅建议用于调试
         @Override
         public String toString() {
-            return chunk.toString(position, chunk.length);
+            return new String(chunk.bytes, chunk.start + position, chunk.length - position);
         }
 
     }
