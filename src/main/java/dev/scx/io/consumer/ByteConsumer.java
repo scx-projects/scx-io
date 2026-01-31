@@ -16,11 +16,15 @@ import dev.scx.io.ByteChunk;
 ///    因此, ByteConsumer 具有 retaining 语义.
 ///
 /// 3. 调用 accept 的一方必须保证:
-///    在 consumer 可能使用期间, 传入的 ByteChunk 所引用的底层 byte[]
-///    不会被覆写或复用;
+///    传入的 ByteChunk 所引用的底层 byte[] 不会被覆写或复用;
 ///    若无法保证该稳定性, 调用方必须在调用 accept 之前自行拷贝数据.
 ///
-/// 4. accept 方法返回值表示是否需要继续提供更多数据:
+/// 4. 只读契约:
+///    传入的 ByteChunk 为只读视图.
+///    ByteConsumer **严禁** 修改 ByteChunk 的底层内容.
+///    违反该约束属于未定义行为, 可能导致数据损坏或不可预期结果.
+///
+/// 5. accept 方法返回值表示是否需要继续提供更多数据:
 ///    - 返回 true  表示 consumer 仍需要更多数据;
 ///    - 返回 false 表示 consumer 已满足需求, 读取过程可提前终止.
 ///
@@ -30,7 +34,7 @@ public interface ByteConsumer {
 
     /// 接收一个 ByteChunk 以供消费.
     ///
-    /// @param chunk 由 ByteInput 提供的稳定数据块视图.
+    /// @param chunk 由 ByteInput 提供的稳定只读数据块视图. 该 ByteChunk 可在 accept 返回后继续使用, 但严禁修改其底层内容.
     /// @return needMore 是否需要继续提供更多数据.
     /// @throws Throwable consumer 内部抛出的异常将由调用方包装并重新抛出.
     boolean accept(ByteChunk chunk) throws Throwable;
