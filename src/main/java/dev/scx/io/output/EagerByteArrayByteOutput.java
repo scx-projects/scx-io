@@ -51,10 +51,6 @@ public final class EagerByteArrayByteOutput extends AbstractByteOutput {
         closed = true;
     }
 
-    public ByteChunk chunk() {
-        return byteConsumer.chunk();
-    }
-
     public byte[] bytes() {
         return byteConsumer.bytes();
     }

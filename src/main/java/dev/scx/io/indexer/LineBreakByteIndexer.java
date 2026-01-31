@@ -23,7 +23,7 @@ public final class LineBreakByteIndexer implements ByteIndexer {
 
         for (int i = 0; i < chunk.length; i = i + 1) {
 
-            var currentByte = chunk.getByte(i);
+            var currentByte = chunk.get(i);
 
             // 未曾匹配 或者 已经处于匹配成功状态
             if (matchedLength == 0) {

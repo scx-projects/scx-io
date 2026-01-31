@@ -210,7 +210,7 @@ public final class DefaultByteInput extends AbstractByteInput {
 
         ensureAvailable();// 确保 有可用数据
 
-        var b = head.chunk.getByte(head.position);
+        var b = head.chunk.get(head.position);
         head.position = head.position + 1;
         return b;
     }
@@ -255,7 +255,7 @@ public final class DefaultByteInput extends AbstractByteInput {
 
         ensureAvailable();// 确保 有可用数据
 
-        return head.chunk.getByte(head.position);
+        return head.chunk.get(head.position);
     }
 
     @Override
@@ -351,9 +351,10 @@ public final class DefaultByteInput extends AbstractByteInput {
             position = 0;
         }
 
+        /// 默认使用平台编码, 仅建议用于调试
         @Override
         public String toString() {
-            return chunk.toString(position, chunk.length);
+            return new String(chunk.bytes, chunk.start + position, chunk.length - position);
         }
 
     }
