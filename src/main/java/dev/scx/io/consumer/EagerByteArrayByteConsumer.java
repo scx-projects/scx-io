@@ -31,6 +31,7 @@ public final class EagerByteArrayByteConsumer implements ByteConsumer {
     }
 
     /// 确保容量
+    ///
     /// @param minCapacity 最小需要的容量
     private void ensureCapacity(int minCapacity) {
         // 旧容量
@@ -44,7 +45,7 @@ public final class EagerByteArrayByteConsumer implements ByteConsumer {
         // 计算新容量
         // 至少满足本次写入所需容量(minGrowth)
         // 若本次增长较小, 则按翻倍策略(oldCapacity)扩容, 减少后续扩容次数.
-        var newLength= oldCapacity + Math.max(minGrowth, oldCapacity);
+        var newLength = oldCapacity + Math.max(minGrowth, oldCapacity);
         // 扩容 bytes
         bytes = Arrays.copyOf(bytes, newLength);
     }
