@@ -19,11 +19,11 @@ public class ByteArrayByteOutputTest {
     public static void test1() {
         byte[] data = new byte[8192 * 2];
 
-        for (int j = 0; j < 50; j++) {
+        for (int j = 0; j < 50; j = j + 1) {
             var start = System.nanoTime();
             var s = new EagerByteArrayByteOutput();
 
-            for (int i = 0; i < 5000; i++) {
+            for (int i = 0; i < 5000; i = i + 1) {
                 s.write(data);
             }
             byte[] bytes = s.bytes();
@@ -33,7 +33,7 @@ public class ByteArrayByteOutputTest {
 
             var s1 = new LazyByteArrayByteOutput();
 
-            for (int i = 0; i < 5000; i++) {
+            for (int i = 0; i < 5000; i = i + 1) {
                 s1.write(data);
             }
 
@@ -52,11 +52,11 @@ public class ByteArrayByteOutputTest {
     public static void test2() {
         byte[] data = new byte[64];
 
-        for (int j = 0; j < 50; j++) {
+        for (int j = 0; j < 50; j = j + 1) {
             var start = System.nanoTime();
             var s = new EagerByteArrayByteOutput();
 
-            for (int i = 0; i < 500000; i++) {
+            for (int i = 0; i < 500000; i = i + 1) {
                 s.write(data);
             }
             byte[] bytes = s.bytes();
@@ -66,7 +66,7 @@ public class ByteArrayByteOutputTest {
 
             var s1 = new LazyByteArrayByteOutput();
 
-            for (int i = 0; i < 500000; i++) {
+            for (int i = 0; i < 500000; i = i + 1) {
                 s1.write(data);
             }
 
@@ -84,10 +84,10 @@ public class ByteArrayByteOutputTest {
     public static void test3() {
         byte[] data = new byte[8192 * 2];
 
-        for (int j = 0; j < 50; j++) {
+        for (int j = 0; j < 50; j = j + 1) {
             var start = System.nanoTime();
 
-            for (int i = 0; i < 50000; i++) {
+            for (int i = 0; i < 50000; i = i + 1) {
                 var s = new EagerByteArrayByteOutput();
                 s.write(data);
                 byte[] bytes = s.bytes();
@@ -96,7 +96,7 @@ public class ByteArrayByteOutputTest {
             var eTime = System.nanoTime() - start;
             start = System.nanoTime();
 
-            for (int i = 0; i < 50000; i++) {
+            for (int i = 0; i < 50000; i = i + 1) {
                 var s1 = new LazyByteArrayByteOutput();
                 s1.write(data);
                 byte[] bytes1 = s1.bytes();
@@ -113,11 +113,11 @@ public class ByteArrayByteOutputTest {
     @Test
     public static void test4() {
 
-        for (int j = 0; j < 50; j++) {
+        for (int j = 0; j < 50; j = j + 1) {
             var start = System.nanoTime();
             var s = new EagerByteArrayByteOutput();
 
-            for (int i = 0; i < 500000; i++) {
+            for (int i = 0; i < 500000; i = i + 1) {
                 s.write((byte) 88);
             }
             byte[] bytes = s.bytes();
@@ -127,7 +127,7 @@ public class ByteArrayByteOutputTest {
 
             var s1 = new LazyByteArrayByteOutput();
 
-            for (int i = 0; i < 500000; i++) {
+            for (int i = 0; i < 500000; i = i + 1) {
                 s1.write((byte) 88);
             }
 
