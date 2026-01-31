@@ -36,7 +36,7 @@ public final class ByteChunk {
     }
 
     /// 索引参数 为 "相对索引", 即相对于当前 ByteChunk 的起点 (逻辑索引 0).
-    public byte getByte(int index) {
+    public byte get(int index) {
         return this.bytes[this.start + index];
     }
 

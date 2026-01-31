@@ -210,7 +210,7 @@ public final class DefaultByteInput extends AbstractByteInput {
 
         ensureAvailable();// 确保 有可用数据
 
-        var b = head.chunk.getByte(head.position);
+        var b = head.chunk.get(head.position);
         head.position = head.position + 1;
         return b;
     }
@@ -255,7 +255,7 @@ public final class DefaultByteInput extends AbstractByteInput {
 
         ensureAvailable();// 确保 有可用数据
 
-        return head.chunk.getByte(head.position);
+        return head.chunk.get(head.position);
     }
 
     @Override
