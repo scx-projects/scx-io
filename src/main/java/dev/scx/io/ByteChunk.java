@@ -50,7 +50,7 @@ public final class ByteChunk {
     /// 默认使用平台编码, 仅建议用于调试
     @Override
     public String toString() {
-        return new String(this.bytes, this.start , this.length);
+        return new String(this.bytes, this.start, this.length);
     }
 
 }
