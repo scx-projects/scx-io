@@ -64,7 +64,7 @@ public final class BitMaskByteIndexer implements ByteIndexer {
 
         }
 
-        return state == 0 ? NO_MATCH : partialMatch( Long.SIZE - Long.numberOfLeadingZeros(state));
+        return state == 0 ? NO_MATCH : partialMatch(Long.SIZE - Long.numberOfLeadingZeros(state));
     }
 
     @Override
