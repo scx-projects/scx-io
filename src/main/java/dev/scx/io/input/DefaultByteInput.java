@@ -11,7 +11,6 @@ import dev.scx.io.exception.NoMatchFoundException;
 import dev.scx.io.exception.NoMoreDataException;
 import dev.scx.io.exception.ScxInputException;
 import dev.scx.io.indexer.ByteIndexer;
-import dev.scx.io.indexer.ByteIndexerMatchResult;
 import dev.scx.io.indexer.ByteIndexerMatchResult.FullMatch;
 import dev.scx.io.supplier.ByteSupplier;
 
