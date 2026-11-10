@@ -36,7 +36,7 @@ public sealed interface ByteIndexerMatchResult permits NoMatch, PartialMatch, Fu
     /// 部分匹配
     final class PartialMatch implements ByteIndexerMatchResult {
 
-        /// 表示当前与 Pattern 前缀部分匹配的长度.
+        /// 表示当前部分匹配的长度.
         public final int matchedLength;
 
         private PartialMatch(int matchedLength) {
