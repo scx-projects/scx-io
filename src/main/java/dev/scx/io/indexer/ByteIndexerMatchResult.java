@@ -9,9 +9,9 @@ import static dev.scx.io.indexer.ByteIndexerMatchResult.*;
 /// @author scx567888
 public sealed interface ByteIndexerMatchResult permits NoMatch, PartialMatch, FullMatch {
 
-    ByteIndexerMatchResult NO_MATCH_RESULT = new NoMatch();
+    ByteIndexerMatchResult NO_MATCH = new NoMatch();
 
-    ByteIndexerMatchResult PARTIAL_MATCH_RESULT = new PartialMatch();
+    ByteIndexerMatchResult PARTIAL_MATCH = new PartialMatch();
 
     static ByteIndexerMatchResult fullMatch(int index, int matchedLength) {
         return new FullMatch(index, matchedLength);

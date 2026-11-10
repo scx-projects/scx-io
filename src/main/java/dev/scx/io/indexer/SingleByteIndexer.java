@@ -2,7 +2,7 @@ package dev.scx.io.indexer;
 
 import dev.scx.io.ByteChunk;
 
-import static dev.scx.io.indexer.ByteIndexerMatchResult.NO_MATCH_RESULT;
+import static dev.scx.io.indexer.ByteIndexerMatchResult.NO_MATCH;
 import static dev.scx.io.indexer.ByteIndexerMatchResult.fullMatch;
 
 /// SingleByteIndexer
@@ -24,7 +24,7 @@ public final class SingleByteIndexer implements ByteIndexer {
                 return fullMatch(i, 1);
             }
         }
-        return NO_MATCH_RESULT;
+        return NO_MATCH;
     }
 
     @Override

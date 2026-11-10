@@ -64,7 +64,7 @@ public final class BitMaskByteIndexer implements ByteIndexer {
 
         }
 
-        return state == 0 ? NO_MATCH_RESULT : PARTIAL_MATCH_RESULT;
+        return state == 0 ? NO_MATCH : PARTIAL_MATCH;
     }
 
     @Override

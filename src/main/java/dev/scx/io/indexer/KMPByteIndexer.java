@@ -71,7 +71,7 @@ public final class KMPByteIndexer implements ByteIndexer {
             }
         }
 
-        return matchedLength == 0 ? NO_MATCH_RESULT : PARTIAL_MATCH_RESULT;
+        return matchedLength == 0 ? NO_MATCH : PARTIAL_MATCH;
     }
 
     @Override
