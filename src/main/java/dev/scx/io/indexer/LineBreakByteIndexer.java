@@ -46,7 +46,7 @@ public final class LineBreakByteIndexer implements ByteIndexer {
             }
         }
 
-        return matchedLength == 0 ? NO_MATCH : PARTIAL_MATCH;
+        return matchedLength == 0 ? NO_MATCH : partialMatch(matchedLength);
     }
 
     @Override

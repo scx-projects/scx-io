@@ -11,7 +11,9 @@ public sealed interface ByteIndexerMatchResult permits NoMatch, PartialMatch, Fu
 
     ByteIndexerMatchResult NO_MATCH = new NoMatch();
 
-    ByteIndexerMatchResult PARTIAL_MATCH = new PartialMatch();
+    static ByteIndexerMatchResult partialMatch(int matchedLength) {
+        return new PartialMatch(matchedLength);
+    }
 
     static ByteIndexerMatchResult fullMatch(int index, int matchedLength) {
         return new FullMatch(index, matchedLength);
@@ -34,13 +36,16 @@ public sealed interface ByteIndexerMatchResult permits NoMatch, PartialMatch, Fu
     /// 部分匹配
     final class PartialMatch implements ByteIndexerMatchResult {
 
-        private PartialMatch() {
+        /// 表示当前部分匹配的长度.
+        public final int matchedLength;
 
+        private PartialMatch(int matchedLength) {
+            this.matchedLength = matchedLength;
         }
 
         @Override
         public String toString() {
-            return "PartialMatch[]";
+            return "PartialMatch[matchedLength=" + matchedLength + ']';
         }
 
     }
