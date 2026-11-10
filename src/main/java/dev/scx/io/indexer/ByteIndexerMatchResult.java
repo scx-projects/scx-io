@@ -11,8 +11,8 @@ public sealed interface ByteIndexerMatchResult permits NoMatch, PartialMatch, Fu
 
     ByteIndexerMatchResult NO_MATCH = new NoMatch();
 
-    static ByteIndexerMatchResult partialMatch(int unresolvedSuffixLength) {
-        return new PartialMatch(unresolvedSuffixLength);
+    static ByteIndexerMatchResult partialMatch(int matchedLength) {
+        return new PartialMatch(matchedLength);
     }
 
     static ByteIndexerMatchResult fullMatch(int index, int matchedLength) {
@@ -33,43 +33,19 @@ public sealed interface ByteIndexerMatchResult permits NoMatch, PartialMatch, Fu
 
     }
 
-    /// 部分匹配 (存在尚不能安全释放的未决后缀)
+    /// 部分匹配
     final class PartialMatch implements ByteIndexerMatchResult {
 
-        /// 未决后缀长度, 单位为字节.
-        ///
-        /// 表示截至当前, 已消费输入的末尾有多少字节尚不能被证明可以安全释放.
-        /// 该后缀之前的所有字节均已确定不会再影响后续匹配, 可以永久释放.
-        ///
-        /// 该值描述的是安全释放边界, 而非匹配进度, 因此不一定等于实际匹配的前缀长度,
-        /// 并且可以跨越多个 ByteChunk.
-        ///
-        /// 实现应返回精确值; 已经被判定为安全的字节, 不得在后续结果中重新变为未决.
-        ///
-        /// 例如, 假设匹配模式为 `"abcde"`:
-        ///
-        /// ```
-        /// Chunk 1: "xxa"
-        /// Chunk 2: "bc"
-        ///
-        /// 当前已消费输入: "xxabc"
-        ///
-        /// PartialMatch(3)
-        ///
-        /// 安全前缀: "xx"
-        /// 未决后缀: "abc"
-        /// ```
-        ///
-        /// 此时 `"abc"` 仍有可能与后续输入 `"de"` 组成完整匹配, 因此必须保留; 而前面的 `"xx"` 已经可以安全释放.
-        public final int unresolvedSuffixLength;
+        /// 表示截至当前, 已消费输入的末尾与 Pattern 前缀匹配的最长长度.
+        public final int matchedLength;
 
-        private PartialMatch(int unresolvedSuffixLength) {
-            this.unresolvedSuffixLength = unresolvedSuffixLength;
+        private PartialMatch(int matchedLength) {
+            this.matchedLength = matchedLength;
         }
 
         @Override
         public String toString() {
-            return "PartialMatch[unresolvedSuffixLength=" + unresolvedSuffixLength + ']';
+            return "PartialMatch[matchedLength=" + matchedLength + ']';
         }
 
     }
