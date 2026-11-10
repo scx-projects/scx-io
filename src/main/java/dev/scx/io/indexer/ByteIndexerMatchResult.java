@@ -33,7 +33,7 @@ public sealed interface ByteIndexerMatchResult permits NoMatch, PartialMatch, Fu
 
     }
 
-    /// 部分匹配
+    /// 部分匹配 (存在尚不能安全释放的未决后缀)
     final class PartialMatch implements ByteIndexerMatchResult {
 
         /// 未决后缀长度, 单位为字节.
