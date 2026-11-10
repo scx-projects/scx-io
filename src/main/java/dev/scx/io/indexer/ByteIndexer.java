@@ -30,7 +30,7 @@ public interface ByteIndexer {
     /// @param chunk 一个稳定只读数据块视图. 该 ByteChunk 可在 indexOf 返回后继续使用, 但严禁修改其底层内容.
     ByteIndexerMatchResult indexOf(ByteChunk chunk);
 
-    /// 匹配串的长度
+    /// 模式串的长度
     ///
     /// - 对于固定长度模式串: 返回匹配串的长度
     /// - 对于无法静态确定的可变长度模式串 (如正则), 返回 -1.
