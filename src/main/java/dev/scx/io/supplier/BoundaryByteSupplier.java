@@ -8,12 +8,12 @@ import dev.scx.io.exception.InputAlreadyClosedException;
 import dev.scx.io.exception.NoMoreDataException;
 import dev.scx.io.exception.ScxInputException;
 import dev.scx.io.indexer.ByteIndexer;
+import dev.scx.io.indexer.ByteIndexerMatchResult.FullMatch;
+import dev.scx.io.indexer.ByteIndexerMatchResult.NoMatch;
 
 import java.util.LinkedList;
 
 import static dev.scx.io.ByteChunk.EMPTY_BYTE_CHUNK;
-import static dev.scx.io.indexer.StatusByteMatchResult.Status.FULL_MATCH;
-import static dev.scx.io.indexer.StatusByteMatchResult.Status.NO_MATCH;
 
 /// BoundaryByteSupplier
 ///
@@ -89,11 +89,11 @@ public final class BoundaryByteSupplier implements ByteSupplier {
         var indexMatchResult = byteIndexer.indexOf(byteChunk);
 
         // 6, 匹配到了 应该终结
-        if (indexMatchResult.status == FULL_MATCH) {
+        if (indexMatchResult instanceof FullMatch fullMatch) {
             // 匹配的长度
-            var matchedLength = indexMatchResult.matchedLength;
+            var matchedLength = fullMatch.matchedLength;
             // 计算针对当前块来说的 安全索引.
-            var safeLength = indexMatchResult.index + matchedLength;
+            var safeLength = fullMatch.index + matchedLength;
 
             var sourceSkipLength = safeLength;
 
@@ -106,7 +106,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
                 for (var chunk : cache) {
                     cacheLength += chunk.length;
                 }
-                sourceSkipLength = cacheLength + indexMatchResult.index;
+                sourceSkipLength = cacheLength + fullMatch.index;
             }
 
             // 按照常规流程, 这里的 skipFully 只可能读取缓冲区中的数据, 也就是说理论上不可能出现 NoMoreDataException.
@@ -121,7 +121,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
             if (cache.isEmpty()) {
                 // 根据方法行为设定, 返回的块不应包含 分隔符.
                 // 这里既然没有缓存 就说明 当前块中包含了完整的 boundary, 所以直接使用 i 进行 截断是安全的.
-                return byteChunk.subChunk(0, indexMatchResult.index);
+                return byteChunk.subChunk(0, fullMatch.index);
             } else {
                 // 这里既然有缓存, 就说明当前分块只是包含了部分的 boundary.
                 // 所以不能直接使用 i 截断, 而是应该使用 safeLength.
@@ -138,7 +138,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
         }
 
         // 7, 未匹配到, 需要判断是 完全未匹配 还是 部分匹配
-        if (indexMatchResult.status == NO_MATCH) { // 完全未匹配 表示当前块可以 安全使用
+        if (indexMatchResult instanceof NoMatch) { // 完全未匹配 表示当前块可以 安全使用
             // 异常相关说明, 参考上面的 byteInput.skipFully(safeLength);
             byteInput.skipFully(byteChunk.length);
             // 如果当前缓存 没有数据直接返回 否则添加到缓存中等待下次 读取

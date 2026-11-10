@@ -2,7 +2,7 @@ package dev.scx.io.indexer;
 
 import dev.scx.io.ByteChunk;
 
-import static dev.scx.io.indexer.StatusByteMatchResult.*;
+import static dev.scx.io.indexer.ByteIndexerMatchResult.*;
 
 /// LineBreakByteIndexer
 ///
@@ -18,7 +18,7 @@ public final class LineBreakByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public StatusByteMatchResult indexOf(ByteChunk chunk) {
+    public ByteIndexerMatchResult indexOf(ByteChunk chunk) {
 
         for (int i = 0; i < chunk.length; i = i + 1) {
 

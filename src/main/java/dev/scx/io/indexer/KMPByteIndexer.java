@@ -2,7 +2,7 @@ package dev.scx.io.indexer;
 
 import dev.scx.io.ByteChunk;
 
-import static dev.scx.io.indexer.StatusByteMatchResult.*;
+import static dev.scx.io.indexer.ByteIndexerMatchResult.*;
 
 /// KMPByteIndexer
 ///
@@ -48,7 +48,7 @@ public final class KMPByteIndexer implements ByteIndexer {
     ///
     /// 若违反此前提, indexOf 的行为未定义.
     @Override
-    public StatusByteMatchResult indexOf(ByteChunk chunk) {
+    public ByteIndexerMatchResult indexOf(ByteChunk chunk) {
 
         //KMP 查找
         for (int i = 0; i < chunk.length; i = i + 1) {

@@ -28,7 +28,7 @@ public interface ByteIndexer {
     /// - 为了防止 异常冲突 indexOf 不允许抛出任何易混淆异常 如 [ScxInputException], [InputAlreadyClosedException].
     ///
     /// @param chunk 一个稳定只读数据块视图. 该 ByteChunk 可在 indexOf 返回后继续使用, 但严禁修改其底层内容.
-    StatusByteMatchResult indexOf(ByteChunk chunk);
+    ByteIndexerMatchResult indexOf(ByteChunk chunk);
 
     /// 匹配串的长度
     ///

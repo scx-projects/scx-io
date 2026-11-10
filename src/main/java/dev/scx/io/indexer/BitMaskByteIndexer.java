@@ -2,7 +2,7 @@ package dev.scx.io.indexer;
 
 import dev.scx.io.ByteChunk;
 
-import static dev.scx.io.indexer.StatusByteMatchResult.*;
+import static dev.scx.io.indexer.ByteIndexerMatchResult.*;
 
 /// BitMaskByteIndexer
 ///
@@ -39,7 +39,7 @@ public final class BitMaskByteIndexer implements ByteIndexer {
     ///
     /// 若违反此前提, indexOf 的行为未定义.
     @Override
-    public StatusByteMatchResult indexOf(ByteChunk chunk) {
+    public ByteIndexerMatchResult indexOf(ByteChunk chunk) {
 
         var endBit = 1L << (pattern.length - 1);
 
