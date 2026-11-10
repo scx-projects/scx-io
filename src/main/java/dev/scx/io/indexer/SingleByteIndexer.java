@@ -2,8 +2,8 @@ package dev.scx.io.indexer;
 
 import dev.scx.io.ByteChunk;
 
-import static dev.scx.io.indexer.StatusByteMatchResult.NO_MATCH_RESULT;
-import static dev.scx.io.indexer.StatusByteMatchResult.fullMatch;
+import static dev.scx.io.indexer.ByteIndexerMatchResult.NO_MATCH;
+import static dev.scx.io.indexer.ByteIndexerMatchResult.fullMatch;
 
 /// SingleByteIndexer
 ///
@@ -17,19 +17,19 @@ public final class SingleByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public StatusByteMatchResult indexOf(ByteChunk chunk) {
+    public ByteIndexerMatchResult indexOf(ByteChunk chunk) {
         // 普通 查找
         for (var i = 0; i < chunk.length; i = i + 1) {
             if (chunk.get(i) == b) {
                 return fullMatch(i, 1);
             }
         }
-        return NO_MATCH_RESULT;
+        return NO_MATCH;
     }
 
     @Override
-    public boolean isEmptyPattern() {
-        return false;
+    public int patternLength() {
+        return 1;
     }
 
     @Override

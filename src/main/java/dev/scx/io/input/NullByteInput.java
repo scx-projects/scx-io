@@ -99,7 +99,7 @@ public final class NullByteInput implements ByteInput {
     public ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, NoMoreDataException, InputAlreadyClosedException {
         ensureOpen();
 
-        if (indexer.isEmptyPattern()) {
+        if (indexer.patternLength() == 0) {
             return new ByteMatchResult(0, 0);
         }
 

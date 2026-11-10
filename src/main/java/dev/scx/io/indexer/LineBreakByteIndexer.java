@@ -2,7 +2,7 @@ package dev.scx.io.indexer;
 
 import dev.scx.io.ByteChunk;
 
-import static dev.scx.io.indexer.StatusByteMatchResult.*;
+import static dev.scx.io.indexer.ByteIndexerMatchResult.*;
 
 /// LineBreakByteIndexer
 ///
@@ -18,7 +18,7 @@ public final class LineBreakByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public StatusByteMatchResult indexOf(ByteChunk chunk) {
+    public ByteIndexerMatchResult indexOf(ByteChunk chunk) {
 
         for (int i = 0; i < chunk.length; i = i + 1) {
 
@@ -46,12 +46,12 @@ public final class LineBreakByteIndexer implements ByteIndexer {
             }
         }
 
-        return matchedLength == 0 ? NO_MATCH_RESULT : PARTIAL_MATCH_RESULT;
+        return matchedLength == 0 ? NO_MATCH : PARTIAL_MATCH;
     }
 
     @Override
-    public boolean isEmptyPattern() {
-        return false;
+    public int patternLength() {
+        return -1;
     }
 
     @Override

@@ -28,13 +28,14 @@ public interface ByteIndexer {
     /// - 为了防止 异常冲突 indexOf 不允许抛出任何易混淆异常 如 [ScxInputException], [InputAlreadyClosedException].
     ///
     /// @param chunk 一个稳定只读数据块视图. 该 ByteChunk 可在 indexOf 返回后继续使用, 但严禁修改其底层内容.
-    StatusByteMatchResult indexOf(ByteChunk chunk);
+    ByteIndexerMatchResult indexOf(ByteChunk chunk);
 
-    /// 是否为空匹配模式
-    /// - 对于固定长度模式串: 返回 是否是空模式串
-    /// - 对于无法静态确定的可变长度模式串 (如正则), 返回 false.
-    /// - 为了防止 异常冲突 isEmptyPattern 不允许抛出任何易混淆异常 如 [ScxInputException], [InputAlreadyClosedException].
-    boolean isEmptyPattern();
+    /// 模式串的长度
+    ///
+    /// - 对于固定长度模式串: 返回 模式串的长度
+    /// - 对于无法静态确定的可变长度模式串 (如正则), 返回 -1.
+    /// - 为了防止 异常冲突 patternLength 不允许抛出任何易混淆异常 如 [ScxInputException], [InputAlreadyClosedException].
+    int patternLength();
 
     /// 重置匹配状态
     void reset();

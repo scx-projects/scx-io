@@ -2,7 +2,7 @@ package dev.scx.io.indexer;
 
 import dev.scx.io.ByteChunk;
 
-import static dev.scx.io.indexer.StatusByteMatchResult.*;
+import static dev.scx.io.indexer.ByteIndexerMatchResult.*;
 
 /// KMPByteIndexer
 ///
@@ -44,11 +44,11 @@ public final class KMPByteIndexer implements ByteIndexer {
 
     /// 前提条件:
     /// - pattern.length > 0
-    /// - 空匹配模式不在本实现的处理范围内, 必须由调用者提前判断, 例如通过 isEmptyPattern().
+    /// - 空匹配模式不在本实现的处理范围内, 必须由调用者提前判断, 例如通过 patternLength() == 0.
     ///
     /// 若违反此前提, indexOf 的行为未定义.
     @Override
-    public StatusByteMatchResult indexOf(ByteChunk chunk) {
+    public ByteIndexerMatchResult indexOf(ByteChunk chunk) {
 
         //KMP 查找
         for (int i = 0; i < chunk.length; i = i + 1) {
@@ -71,12 +71,12 @@ public final class KMPByteIndexer implements ByteIndexer {
             }
         }
 
-        return matchedLength == 0 ? NO_MATCH_RESULT : PARTIAL_MATCH_RESULT;
+        return matchedLength == 0 ? NO_MATCH : PARTIAL_MATCH;
     }
 
     @Override
-    public boolean isEmptyPattern() {
-        return pattern.length == 0;
+    public int patternLength() {
+        return pattern.length;
     }
 
     @Override

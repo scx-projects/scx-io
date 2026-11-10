@@ -11,10 +11,10 @@ import dev.scx.io.exception.NoMatchFoundException;
 import dev.scx.io.exception.NoMoreDataException;
 import dev.scx.io.exception.ScxInputException;
 import dev.scx.io.indexer.ByteIndexer;
+import dev.scx.io.indexer.ByteIndexerMatchResult.FullMatch;
 import dev.scx.io.supplier.ByteSupplier;
 
 import static dev.scx.io.ByteChunk.EMPTY_BYTE_CHUNK;
-import static dev.scx.io.indexer.StatusByteMatchResult.Status.FULL_MATCH;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.min;
 
@@ -180,8 +180,8 @@ public final class DefaultByteInput implements ByteInput {
             var length = (int) min(n.available(), maxLength - index);
             var indexMatchResult = indexer.indexOf(n.chunk.subChunk(n.position, n.position + length));
             // 此处因为支持回溯匹配 所以可能是负数 NO_MATCH 表示真正未找到
-            if (indexMatchResult.status == FULL_MATCH) {
-                return new ByteMatchResult(index + indexMatchResult.index, indexMatchResult.matchedLength);
+            if (indexMatchResult instanceof FullMatch fullMatch) {
+                return new ByteMatchResult(index + fullMatch.index, fullMatch.matchedLength);
             }
 
             index += length;
@@ -303,7 +303,7 @@ public final class DefaultByteInput implements ByteInput {
     public ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, NoMoreDataException, ScxInputException, InputAlreadyClosedException {
         ensureOpen();// 确保 open
 
-        if (indexer.isEmptyPattern()) {
+        if (indexer.patternLength() == 0) {
             return new ByteMatchResult(0, 0);
         }
 
