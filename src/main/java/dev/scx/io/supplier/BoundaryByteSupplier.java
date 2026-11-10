@@ -37,7 +37,7 @@ public final class BoundaryByteSupplier implements ByteSupplier {
         this.consumer = new ByteChunkByteConsumer();
         this.cache = new LinkedList<>();
         this.useCache = false;
-        this.isFinish = this.byteIndexer.isEmptyPattern();
+        this.isFinish = this.byteIndexer.patternLength() == 0;
         this.mark = null;
     }
 

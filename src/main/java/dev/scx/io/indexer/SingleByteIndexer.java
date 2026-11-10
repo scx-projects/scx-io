@@ -28,8 +28,8 @@ public final class SingleByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public boolean isEmptyPattern() {
-        return false;
+    public int patternLength() {
+        return 1;
     }
 
     @Override

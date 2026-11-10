@@ -68,8 +68,8 @@ public final class BitMaskByteIndexer implements ByteIndexer {
     }
 
     @Override
-    public boolean isEmptyPattern() {
-        return pattern.length == 0;
+    public int patternLength() {
+        return pattern.length;
     }
 
     @Override

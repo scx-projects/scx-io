@@ -303,7 +303,7 @@ public final class DefaultByteInput implements ByteInput {
     public ByteMatchResult indexOf(ByteIndexer indexer, long maxLength) throws NoMatchFoundException, NoMoreDataException, ScxInputException, InputAlreadyClosedException {
         ensureOpen();// 确保 open
 
-        if (indexer.isEmptyPattern()) {
+        if (indexer.patternLength() == 0) {
             return new ByteMatchResult(0, 0);
         }
 
